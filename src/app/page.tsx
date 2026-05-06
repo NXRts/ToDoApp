@@ -5,14 +5,16 @@ import { useTasks } from '@/hooks/useTasks';
 import { Sidebar } from '@/components/Sidebar';
 import { TaskInput } from '@/components/TaskInput';
 import { TaskItem } from '@/components/TaskItem';
+import { TaskDetails } from '@/components/TaskDetails';
 import { ViewMode } from '@/types/todo';
 import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns';
 
 export default function Home() {
-  const { tasks, lists, tags, addTask, toggleTaskCompletion } = useTasks();
+  const { tasks, lists, tags, addTask, toggleTaskCompletion, updateTask, deleteTask } = useTasks();
   
   const [currentView, setCurrentView] = useState<ViewMode>('today');
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   // Filter tasks based on view or list
   const filteredTasks = useMemo(() => {
@@ -43,8 +45,10 @@ export default function Home() {
     }
   }, [currentView, selectedListId, lists]);
 
+  const selectedTask = useMemo(() => tasks.find(t => t.id === selectedTaskId), [tasks, selectedTaskId]);
+
   return (
-    <div className="flex w-full min-h-screen bg-background">
+    <div className="flex w-full h-screen bg-background overflow-hidden">
       <Sidebar 
         lists={lists} 
         tags={tags} 
@@ -54,7 +58,7 @@ export default function Home() {
         onListSelect={setSelectedListId}
       />
       
-      <main className="flex-1 flex flex-col p-8 lg:px-16 lg:py-12 overflow-y-auto custom-scrollbar">
+      <main className="flex-1 flex flex-col p-8 lg:px-12 xl:px-16 lg:py-10 overflow-y-auto custom-scrollbar">
         {/* Main Header */}
         <header className="flex items-center gap-4 mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">{headerTitle}</h1>
@@ -77,11 +81,25 @@ export default function Home() {
                 task={task} 
                 onToggle={toggleTaskCompletion} 
                 listDetails={lists.find(l => l.id === task.category)}
+                onClick={() => setSelectedTaskId(task.id)}
+                isSelected={selectedTaskId === task.id}
               />
             ))
           )}
         </div>
       </main>
+
+      {/* Task Details Panel */}
+      {selectedTask && (
+        <TaskDetails 
+          task={selectedTask}
+          lists={lists}
+          tags={tags}
+          onSave={updateTask}
+          onDelete={deleteTask}
+          onClose={() => setSelectedTaskId(null)}
+        />
+      )}
     </div>
   );
 }

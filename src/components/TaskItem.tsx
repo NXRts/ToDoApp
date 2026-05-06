@@ -9,13 +9,24 @@ interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
   listDetails?: TodoList;
+  onClick?: () => void;
+  isSelected?: boolean;
 }
 
-export function TaskItem({ task, onToggle, listDetails }: TaskItemProps) {
+export function TaskItem({ task, onToggle, listDetails, onClick, isSelected }: TaskItemProps) {
   return (
-    <div className="group flex items-start gap-4 py-4 border-b border-border transition-colors hover:bg-muted/30 px-2 rounded-lg -mx-2">
+    <div 
+      onClick={onClick}
+      className={twMerge(
+        "group flex items-start gap-4 py-4 border-b border-border transition-colors px-2 rounded-lg -mx-2 cursor-pointer",
+        isSelected ? "bg-muted/50" : "hover:bg-muted/30"
+      )}
+    >
       {/* Checkbox */}
-      <div className="pt-0.5 shrink-0">
+      <div 
+        className="pt-0.5 shrink-0" 
+        onClick={(e) => e.stopPropagation()} // Prevent opening task details when just checking off
+      >
         <input
           type="checkbox"
           checked={task.isCompleted}
@@ -47,7 +58,9 @@ export function TaskItem({ task, onToggle, listDetails }: TaskItemProps) {
             
             {task.subtasks && task.subtasks.length > 0 && (
               <span className="flex items-center gap-1.5 text-muted-foreground border border-border px-2 py-0.5 rounded-md bg-muted/50">
-                <span className="w-4 h-4 bg-border/80 text-[10px] rounded-sm flex items-center justify-center text-foreground font-bold">{task.subtasks.length}</span>
+                <span className="w-4 h-4 bg-border/80 text-[10px] rounded-sm flex items-center justify-center text-foreground font-bold">
+                  {task.subtasks.length}
+                </span>
                 Subtasks
               </span>
             )}

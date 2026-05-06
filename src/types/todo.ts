@@ -9,6 +9,7 @@ export interface Subtask {
 export interface Task {
   id: string;
   title: string;
+  description?: string; // Optional description
   category: string; // Used as List ID now
   priority: Priority;
   deadline: string; // ISO string
