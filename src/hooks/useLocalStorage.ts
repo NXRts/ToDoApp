@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  // State to store our value
-  // Pass initial state function to useState so logic is only executed once
+  // Use a ref to prevent unnecessary effect triggers
+  const isFirstRender = useRef(true);
+
+  // Initialize state with initialValue, then load from storage in useEffect
   const [storedValue, setStoredValue] = useState<T>(initialValue);
 
-  // Use an effect to read from local storage after mounting
-  // This avoids hydration mismatch between server and client
+  // Load from localStorage on mount
   useEffect(() => {
     try {
       const item = window.localStorage.getItem(key);
@@ -18,22 +19,20 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   }, [key]);
 
-  // Return a wrapped version of useState's setter function that ...
-  // ... persists the new value to localStorage.
-  const setValue = (value: T | ((val: T) => T)) => {
+  // Persist to localStorage whenever storedValue changes
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    
     try {
-      // Allow value to be a function so we have same API as useState
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      // Save state
-      setStoredValue(valueToStore);
-      // Save to local storage
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      }
+      window.localStorage.setItem(key, JSON.stringify(storedValue));
     } catch (error) {
       console.warn(`Error setting localStorage key "${key}":`, error);
     }
-  };
+  }, [key, storedValue]);
 
-  return [storedValue, setValue] as const;
+  return [storedValue, setStoredValue] as const;
 }
+

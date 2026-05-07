@@ -32,9 +32,10 @@ export default function Home() {
       
       if (currentView === 'upcoming') {
         if (deadlineDate) {
-          return isToday(deadlineDate) || isTomorrow(deadlineDate) || isThisWeek(deadlineDate);
+          // Show tasks for today, tomorrow, and anything in the next 7 days
+          return isToday(deadlineDate) || isTomorrow(deadlineDate) || (deadlineDate >= new Date() && deadlineDate <= new Date(new Date().setDate(new Date().getDate() + 7)));
         }
-        return isToday(createdDate); // Show tasks created today in Upcoming/Today section
+        return isToday(createdDate); 
       }
       
       return true;
@@ -134,7 +135,9 @@ export default function Home() {
                   {filteredTasks.filter(t => {
                     if (!t.deadline) return false;
                     const d = parseISO(t.deadline);
-                    return isThisWeek(d) && !isToday(d) && !isTomorrow(d);
+                    const nextWeek = new Date();
+                    nextWeek.setDate(nextWeek.getDate() + 7);
+                    return d > new Date() && !isToday(d) && !isTomorrow(d) && d <= nextWeek;
                   }).map(task => (
                     <TaskItem 
                       key={task.id} 
