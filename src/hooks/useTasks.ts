@@ -28,7 +28,8 @@ export function useTasks() {
       tags: [],
       subtasks: [],
     };
-    setTasks((prevTasks) => [newTask, ...prevTasks]);
+    setTasks((prev) => [...prev, newTask]);
+    return newTask.id;
   };
 
   const updateTask = (id: string, updates: Partial<Omit<Task, 'id' | 'createdAt'>>) => {

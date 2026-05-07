@@ -7,6 +7,7 @@ import { TaskInput } from '@/components/TaskInput';
 import { TaskItem } from '@/components/TaskItem';
 import { TaskDetails } from '@/components/TaskDetails';
 import { CalendarView } from '@/components/CalendarView';
+import { StickyWall } from '@/components/StickyWall';
 import { ViewMode } from '@/types/todo';
 import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns';
 
@@ -88,6 +89,16 @@ export default function Home() {
               lists={lists} 
               onTaskClick={setSelectedTaskId}
               selectedTaskId={selectedTaskId}
+            />
+          ) : currentView === 'sticky-wall' ? (
+            <StickyWall 
+              tasks={tasks} 
+              lists={lists} 
+              onTaskClick={setSelectedTaskId} 
+              onAddTask={() => {
+                const id = addTask('New Note', selectedListId || '');
+                setSelectedTaskId(id);
+              }} 
             />
           ) : currentView === 'upcoming' && !selectedListId ? (
             // Grouped 3-Card Bento view for Upcoming
