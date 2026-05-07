@@ -23,10 +23,21 @@ export default function Home() {
     }
     
     return tasks.filter(task => {
-      const date = parseISO(task.createdAt); // Simplified logic
-      if (currentView === 'today') return isToday(date);
-      if (currentView === 'upcoming') return isToday(date) || isTomorrow(date) || isThisWeek(date);
-      return true; // fallback for others
+      const deadlineDate = task.deadline ? parseISO(task.deadline) : null;
+      const createdDate = parseISO(task.createdAt);
+      
+      if (currentView === 'today') {
+        return (deadlineDate && isToday(deadlineDate)) || (!deadlineDate && isToday(createdDate));
+      }
+      
+      if (currentView === 'upcoming') {
+        if (deadlineDate) {
+          return isToday(deadlineDate) || isTomorrow(deadlineDate) || isThisWeek(deadlineDate);
+        }
+        return isToday(createdDate); // Show tasks created today in Upcoming/Today section
+      }
+      
+      return true;
     });
   }, [tasks, currentView, selectedListId]);
 
@@ -67,58 +78,97 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Task Input */}
-        <TaskInput onAdd={(title) => addTask(title, selectedListId || '1')} />
-
         {/* Task List */}
-        <div className="flex flex-col mt-4">
-          {filteredTasks.length === 0 ? (
-            <p className="text-muted-foreground text-sm mt-4">No tasks found.</p>
-          ) : currentView === 'upcoming' && !selectedListId ? (
-            // Grouped view for Upcoming
-            <div className="space-y-8">
-              {['Today', 'Tomorrow', 'Later this Week'].map(group => {
-                const groupTasks = filteredTasks.filter(task => {
-                  const date = parseISO(task.createdAt);
-                  if (group === 'Today') return isToday(date);
-                  if (group === 'Tomorrow') return isTomorrow(date);
-                  if (group === 'Later this Week') return isThisWeek(date) && !isToday(date) && !isTomorrow(date);
-                  return false;
-                });
+        <div className="flex flex-col">
+          {currentView === 'upcoming' && !selectedListId ? (
+            // Grouped 3-Card Bento view for Upcoming
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+              {/* Today Section (Full Width) */}
+              <div className="col-span-1 md:col-span-2 bg-card border border-border rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-foreground mb-6">Today</h3>
+                <TaskInput onAdd={(title) => addTask(title, '', 'Medium', new Date().toISOString())} />
+                <div className="flex flex-col mt-4">
+                  {filteredTasks.filter(t => {
+                    const d = t.deadline ? parseISO(t.deadline) : parseISO(t.createdAt);
+                    return isToday(d);
+                  }).map(task => (
+                    <TaskItem 
+                      key={task.id} 
+                      task={task} 
+                      onToggle={toggleTaskCompletion} 
+                      listDetails={lists.find(l => l.id === task.category)}
+                      onClick={() => setSelectedTaskId(task.id)}
+                      isSelected={selectedTaskId === task.id}
+                    />
+                  ))}
+                </div>
+              </div>
 
-                if (groupTasks.length === 0) return null;
+              {/* Tomorrow Section */}
+              <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-foreground mb-6">Tomorrow</h3>
+                <TaskInput onAdd={(title) => {
+                  const tomorrow = new Date();
+                  tomorrow.setDate(tomorrow.getDate() + 1);
+                  addTask(title, '', 'Medium', tomorrow.toISOString());
+                }} />
+                <div className="flex flex-col mt-4">
+                  {filteredTasks.filter(t => t.deadline && isTomorrow(parseISO(t.deadline))).map(task => (
+                    <TaskItem 
+                      key={task.id} 
+                      task={task} 
+                      onToggle={toggleTaskCompletion} 
+                      listDetails={lists.find(l => l.id === task.category)}
+                      onClick={() => setSelectedTaskId(task.id)}
+                      isSelected={selectedTaskId === task.id}
+                    />
+                  ))}
+                </div>
+              </div>
 
-                return (
-                  <div key={group} className="flex flex-col">
-                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4 px-1">{group}</h3>
-                    <div className="flex flex-col">
-                      {groupTasks.map(task => (
-                        <TaskItem 
-                          key={task.id} 
-                          task={task} 
-                          onToggle={toggleTaskCompletion} 
-                          listDetails={lists.find(l => l.id === task.category)}
-                          onClick={() => setSelectedTaskId(task.id)}
-                          isSelected={selectedTaskId === task.id}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
+              {/* This Week Section */}
+              <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-foreground mb-6">This Week</h3>
+                <TaskInput onAdd={(title) => addTask(title, '', 'Medium', '')} />
+                <div className="flex flex-col mt-4">
+                  {filteredTasks.filter(t => {
+                    if (!t.deadline) return false;
+                    const d = parseISO(t.deadline);
+                    return isThisWeek(d) && !isToday(d) && !isTomorrow(d);
+                  }).map(task => (
+                    <TaskItem 
+                      key={task.id} 
+                      task={task} 
+                      onToggle={toggleTaskCompletion} 
+                      listDetails={lists.find(l => l.id === task.category)}
+                      onClick={() => setSelectedTaskId(task.id)}
+                      isSelected={selectedTaskId === task.id}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             // Standard list view for Today or specific Lists
-            filteredTasks.map(task => (
-              <TaskItem 
-                key={task.id} 
-                task={task} 
-                onToggle={toggleTaskCompletion} 
-                listDetails={lists.find(l => l.id === task.category)}
-                onClick={() => setSelectedTaskId(task.id)}
-                isSelected={selectedTaskId === task.id}
-              />
-            ))
+            <div className="flex flex-col">
+              <TaskInput onAdd={(title) => addTask(title, selectedListId || '')} />
+              <div className="mt-4">
+                {filteredTasks.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">No tasks found.</p>
+                ) : (
+                  filteredTasks.map(task => (
+                    <TaskItem 
+                      key={task.id} 
+                      task={task} 
+                      onToggle={toggleTaskCompletion} 
+                      listDetails={lists.find(l => l.id === task.category)}
+                      onClick={() => setSelectedTaskId(task.id)}
+                      isSelected={selectedTaskId === task.id}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
           )}
         </div>
       </main>

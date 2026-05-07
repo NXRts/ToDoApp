@@ -14,13 +14,13 @@ export function useTasks() {
     { id: 't2', name: 'Tag 2', color: 'bg-red-100 text-red-800' },
   ]);
 
-  const addTask = (title: string, listId: string = '1', priority: Priority = 'Medium', deadline: string = '') => {
+  const addTask = (title: string, listId: string = '', priority: Priority = 'Medium', deadline: string = '') => {
     const newTask: Task = {
       id: uuidv4(),
       title,
       category: listId,
       priority,
-      deadline: deadline || new Date().toISOString(),
+      deadline: deadline || '',
       isCompleted: false,
       createdAt: new Date().toISOString(),
       tags: [],
