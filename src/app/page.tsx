@@ -25,7 +25,7 @@ export default function Home() {
     return tasks.filter(task => {
       const date = parseISO(task.createdAt); // Simplified logic
       if (currentView === 'today') return isToday(date);
-      if (currentView === 'upcoming') return isTomorrow(date) || isThisWeek(date);
+      if (currentView === 'upcoming') return isToday(date) || isTomorrow(date) || isThisWeek(date);
       return true; // fallback for others
     });
   }, [tasks, currentView, selectedListId]);
@@ -74,7 +74,41 @@ export default function Home() {
         <div className="flex flex-col mt-4">
           {filteredTasks.length === 0 ? (
             <p className="text-muted-foreground text-sm mt-4">No tasks found.</p>
+          ) : currentView === 'upcoming' && !selectedListId ? (
+            // Grouped view for Upcoming
+            <div className="space-y-8">
+              {['Today', 'Tomorrow', 'Later this Week'].map(group => {
+                const groupTasks = filteredTasks.filter(task => {
+                  const date = parseISO(task.createdAt);
+                  if (group === 'Today') return isToday(date);
+                  if (group === 'Tomorrow') return isTomorrow(date);
+                  if (group === 'Later this Week') return isThisWeek(date) && !isToday(date) && !isTomorrow(date);
+                  return false;
+                });
+
+                if (groupTasks.length === 0) return null;
+
+                return (
+                  <div key={group} className="flex flex-col">
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4 px-1">{group}</h3>
+                    <div className="flex flex-col">
+                      {groupTasks.map(task => (
+                        <TaskItem 
+                          key={task.id} 
+                          task={task} 
+                          onToggle={toggleTaskCompletion} 
+                          listDetails={lists.find(l => l.id === task.category)}
+                          onClick={() => setSelectedTaskId(task.id)}
+                          isSelected={selectedTaskId === task.id}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
+            // Standard list view for Today or specific Lists
             filteredTasks.map(task => (
               <TaskItem 
                 key={task.id} 

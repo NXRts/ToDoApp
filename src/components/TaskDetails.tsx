@@ -140,7 +140,9 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
       <div className="mb-8">
         <h3 className="text-lg font-bold mb-3">Subtasks:</h3>
         <form onSubmit={handleAddSubtask} className="flex items-center gap-3 mb-3">
-          <Plus size={16} className="text-muted-foreground" />
+          <button type="submit" className="focus:outline-none hover:text-foreground transition-colors">
+            <Plus size={16} className="text-muted-foreground" />
+          </button>
           <input
             type="text"
             value={newSubtaskTitle}
