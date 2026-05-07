@@ -12,7 +12,9 @@ export interface Task {
   description?: string; // Optional description
   category: string; // Used as List ID now
   priority: Priority;
-  deadline: string; // ISO string
+  deadline: string; // ISO string (Date part)
+  startTime?: string; // e.g. "09:00"
+  duration?: number; // in minutes
   isCompleted: boolean;
   createdAt: string; // ISO string
   tags: string[]; // Array of tag IDs or names

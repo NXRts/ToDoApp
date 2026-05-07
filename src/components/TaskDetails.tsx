@@ -23,6 +23,8 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
   const [dueDate, setDueDate] = useState(task.deadline ? task.deadline.substring(0, 10) : '');
   const [selectedTags, setSelectedTags] = useState<string[]>(task.tags || []);
   const [subtasks, setSubtasks] = useState<Subtask[]>(task.subtasks || []);
+  const [startTime, setStartTime] = useState(task.startTime || '');
+  const [duration, setDuration] = useState(task.duration || 60);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
 
   // Sync state if task prop changes (e.g., clicking a different task)
@@ -33,6 +35,8 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
     setDueDate(task.deadline ? task.deadline.substring(0, 10) : '');
     setSelectedTags(task.tags || []);
     setSubtasks(task.subtasks || []);
+    setStartTime(task.startTime || '');
+    setDuration(task.duration || 60);
     setNewSubtaskTitle('');
   }, [task]);
 
@@ -42,6 +46,8 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
       description,
       category: listId,
       deadline: dueDate ? new Date(dueDate).toISOString() : '',
+      startTime,
+      duration,
       tags: selectedTags,
       subtasks,
     });
@@ -112,6 +118,25 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
             onChange={(e) => setDueDate(e.target.value)}
             className="flex-1 bg-background border border-border rounded-lg py-1.5 px-2 text-sm focus:outline-none text-muted-foreground"
           />
+        </div>
+
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium w-16">Time</span>
+          <div className="flex items-center gap-2 flex-1">
+            <input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="flex-1 bg-background border border-border rounded-lg py-1.5 px-2 text-sm focus:outline-none text-muted-foreground"
+            />
+            <input
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              placeholder="Min"
+              className="w-16 bg-background border border-border rounded-lg py-1.5 px-2 text-sm focus:outline-none text-muted-foreground text-center"
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-4">

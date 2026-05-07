@@ -14,13 +14,15 @@ export function useTasks() {
     { id: 't2', name: 'Tag 2', color: 'bg-red-100 text-red-800' },
   ]);
 
-  const addTask = (title: string, listId: string = '', priority: Priority = 'Medium', deadline: string = '') => {
+  const addTask = (title: string, listId: string = '', priority: Priority = 'Medium', deadline: string = '', startTime: string = '', duration: number = 60) => {
     const newTask: Task = {
       id: uuidv4(),
       title,
       category: listId,
       priority,
       deadline: deadline || '',
+      startTime,
+      duration,
       isCompleted: false,
       createdAt: new Date().toISOString(),
       tags: [],

@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { TaskInput } from '@/components/TaskInput';
 import { TaskItem } from '@/components/TaskItem';
 import { TaskDetails } from '@/components/TaskDetails';
+import { CalendarView } from '@/components/CalendarView';
 import { ViewMode } from '@/types/todo';
 import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns';
 
@@ -81,7 +82,14 @@ export default function Home() {
 
         {/* Task List */}
         <div className="flex flex-col">
-          {currentView === 'upcoming' && !selectedListId ? (
+          {currentView === 'calendar' ? (
+            <CalendarView 
+              tasks={tasks} 
+              lists={lists} 
+              onTaskClick={setSelectedTaskId}
+              selectedTaskId={selectedTaskId}
+            />
+          ) : currentView === 'upcoming' && !selectedListId ? (
             // Grouped 3-Card Bento view for Upcoming
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
               {/* Today Section (Full Width) */}
