@@ -139,7 +139,7 @@ export function SettingsView() {
               <p className="text-sm text-muted-foreground">Manage your public profile and account details.</p>
             </div>
             
-            <div className="flex items-center gap-6 p-4 bg-muted/30 rounded-2xl border border-border/50">
+            <div className="flex items-center gap-6 p-4 bg-muted/30 rounded-2xl border border-border">
               <div className="w-20 h-20 rounded-full bg-foreground flex items-center justify-center text-background text-3xl font-bold uppercase">
                 {profile.name.charAt(0)}
               </div>

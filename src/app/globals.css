@@ -17,12 +17,12 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #222222;
-  --sidebar: #f4f4f4;
+  --foreground: #1a1a1a;
+  --sidebar: #f8f8f8;
   --card: #ffffff;
-  --border: #f0f0f0;
-  --muted: #f9f9f9;
-  --muted-foreground: #888888;
+  --border: #e2e2e2;
+  --muted: #f5f5f5;
+  --muted-foreground: #71717a;
 }
 
 .dark {
@@ -66,7 +66,7 @@ input[type="checkbox"] {
   color: currentColor;
   width: 1.15em;
   height: 1.15em;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border);
   border-radius: 0.25em;
   display: grid;
   place-content: center;
