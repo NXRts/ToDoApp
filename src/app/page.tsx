@@ -8,6 +8,7 @@ import { TaskItem } from '@/components/TaskItem';
 import { TaskDetails } from '@/components/TaskDetails';
 import { CalendarView } from '@/components/CalendarView';
 import { StickyWall } from '@/components/StickyWall';
+import { SettingsView } from '@/components/SettingsView';
 import { ViewMode } from '@/types/todo';
 import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns';
 
@@ -55,6 +56,8 @@ export default function Home() {
       case 'today': return 'Today';
       case 'calendar': return 'Calendar';
       case 'sticky-wall': return 'Sticky Wall';
+      case 'settings': return 'Settings';
+      case 'list': return lists.find(l => l.id === selectedListId)?.name || 'Tasks';
       default: return 'Tasks';
     }
   }, [currentView, selectedListId, lists]);
@@ -100,6 +103,8 @@ export default function Home() {
                 setSelectedTaskId(id);
               }} 
             />
+          ) : currentView === 'settings' ? (
+            <SettingsView />
           ) : currentView === 'upcoming' && !selectedListId ? (
             // Grouped 3-Card Bento view for Upcoming
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">

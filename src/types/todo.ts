@@ -34,4 +34,4 @@ export interface Tag {
   color: string; // hex or tailwind class
 }
 
-export type ViewMode = 'upcoming' | 'today' | 'calendar' | 'sticky-wall' | 'list';
+export type ViewMode = 'upcoming' | 'today' | 'calendar' | 'sticky-wall' | 'list' | 'settings';
