@@ -1,19 +1,37 @@
-'use client';
-
 import { Search, Menu, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut } from 'lucide-react';
-import { TodoList, Tag, ViewMode } from '@/types/todo';
+import { TodoList, Tag, ViewMode, Task } from '@/types/todo';
 import { twMerge } from 'tailwind-merge';
+import { useState } from 'react';
 
 interface SidebarProps {
   lists: TodoList[];
+  tasks: Task[];
   tags: Tag[];
   currentView: ViewMode;
   onViewChange: (view: ViewMode) => void;
   selectedListId: string | null;
   onListSelect: (id: string | null) => void;
+  onAddList: (name: string, color: string) => void;
 }
 
-export function Sidebar({ lists, tags, currentView, onViewChange, selectedListId, onListSelect }: SidebarProps) {
+export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selectedListId, onListSelect, onAddList }: SidebarProps) {
+  const [isAddingList, setIsAddingList] = useState(false);
+  const [newListName, setNewListName] = useState('');
+  const [newListColor, setNewListColor] = useState('bg-blue-500');
+
+  const colors = [
+    'bg-red-500', 'bg-purple-500', 'bg-indigo-500', 'bg-blue-500', 
+    'bg-cyan-500', 'bg-green-500', 'bg-yellow-500', 'bg-orange-500'
+  ];
+
+  const handleAddList = () => {
+    if (newListName.trim()) {
+      onAddList(newListName.trim(), newListColor);
+      setNewListName('');
+      setIsAddingList(false);
+    }
+  };
+
   return (
     <aside className="w-64 h-screen bg-sidebar flex flex-col border-r border-border shrink-0 py-6 px-4 overflow-y-auto custom-scrollbar">
       {/* Header */}
@@ -101,28 +119,84 @@ export function Sidebar({ lists, tags, currentView, onViewChange, selectedListId
       <div className="mb-8 border-t border-border pt-6">
         <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-2">Lists</h2>
         <ul className="space-y-1">
-          {lists.map(list => (
-            <li key={list.id}>
-              <button
-                onClick={() => { onListSelect(list.id); onViewChange('list'); }}
-                className={twMerge(
-                  "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
-                  selectedListId === list.id ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
-                )}
+          {lists.map(list => {
+            const taskCount = tasks.filter(t => t.category === list.id).length;
+            return (
+              <li key={list.id}>
+                <button
+                  onClick={() => { onListSelect(list.id); onViewChange('list'); }}
+                  className={twMerge(
+                    "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors group",
+                    selectedListId === list.id ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={twMerge("w-3 h-3 rounded-[4px]", list.color)}></div>
+                    <span>{list.name}</span>
+                  </div>
+                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md font-bold opacity-70 group-hover:opacity-100 transition-opacity">
+                    {taskCount}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+          
+          {!isAddingList ? (
+            <li>
+              <button 
+                onClick={() => setIsAddingList(true)}
+                className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-border/50 transition-colors mt-2"
               >
-                <div className="flex items-center gap-3">
-                  <div className={twMerge("w-3 h-3 rounded-sm", list.color)}></div>
-                  <span>{list.name}</span>
-                </div>
+                <Plus size={16} />
+                <span>Add New List</span>
               </button>
             </li>
-          ))}
-          <li>
-            <button className="w-full flex items-center gap-3 px-2 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-border/50 transition-colors mt-2">
-              <Plus size={16} />
-              <span>Add New List</span>
-            </button>
-          </li>
+          ) : (
+            <li className="mt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="bg-muted/30 border border-border rounded-xl p-3 space-y-3">
+                <div className="flex items-center gap-3 bg-background border border-border rounded-lg px-3 py-2">
+                  <div className={twMerge("w-3 h-3 rounded-[4px] shrink-0", newListColor)}></div>
+                  <input 
+                    autoFocus
+                    type="text" 
+                    placeholder="List Name"
+                    value={newListName}
+                    onChange={(e) => setNewListName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddList()}
+                    className="w-full bg-transparent border-none text-sm focus:outline-none placeholder:text-muted-foreground/50"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2 px-1">
+                  {colors.map(color => (
+                    <button
+                      key={color}
+                      onClick={() => setNewListColor(color)}
+                      className={twMerge(
+                        "w-4 h-4 rounded-[4px] transition-all hover:scale-110",
+                        color,
+                        newListColor === color ? "ring-2 ring-foreground ring-offset-2 ring-offset-muted/30 scale-110" : ""
+                      )}
+                    />
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={handleAddList}
+                    className="flex-1 bg-foreground text-background text-[10px] font-bold py-1.5 rounded-md hover:opacity-90 transition-opacity"
+                  >
+                    Save
+                  </button>
+                  <button 
+                    onClick={() => setIsAddingList(false)}
+                    className="flex-1 bg-muted text-muted-foreground text-[10px] font-bold py-1.5 rounded-md hover:bg-border transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </li>
+          )}
         </ul>
       </div>
 

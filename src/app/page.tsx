@@ -13,7 +13,7 @@ import { ViewMode } from '@/types/todo';
 import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns';
 
 export default function Home() {
-  const { tasks, lists, tags, addTask, toggleTaskCompletion, updateTask, deleteTask } = useTasks();
+  const { tasks, lists, tags, addTask, toggleTaskCompletion, updateTask, deleteTask, addList } = useTasks();
   
   const [currentView, setCurrentView] = useState<ViewMode>('today');
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
@@ -80,11 +80,13 @@ export default function Home() {
     <div className="flex w-full h-screen bg-background overflow-hidden">
       <Sidebar 
         lists={lists} 
+        tasks={tasks}
         tags={tags} 
         currentView={currentView} 
         onViewChange={setCurrentView}
         selectedListId={selectedListId}
         onListSelect={setSelectedListId}
+        onAddList={addList}
       />
       
       <main className="flex-1 flex flex-col p-8 lg:px-12 xl:px-16 lg:py-10 overflow-y-auto custom-scrollbar">

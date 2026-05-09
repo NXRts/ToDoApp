@@ -50,6 +50,16 @@ export function useTasks() {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
   };
 
+  const addList = (name: string, color: string) => {
+    const newList: TodoList = {
+      id: uuidv4(),
+      name,
+      color,
+    };
+    setLists((prev) => [...prev, newList]);
+    return newList.id;
+  };
+
   return {
     tasks,
     lists,
@@ -58,5 +68,6 @@ export function useTasks() {
     updateTask,
     toggleTaskCompletion,
     deleteTask,
+    addList,
   };
 }
