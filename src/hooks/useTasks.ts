@@ -50,6 +50,18 @@ export function useTasks() {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
   };
 
+  const updateList = (id: string, name: string, color: string) => {
+    setLists((prev) =>
+      prev.map((list) => (list.id === id ? { ...list, name, color } : list))
+    );
+  };
+
+  const deleteList = (id: string) => {
+    setLists((prev) => prev.filter((list) => list.id !== id));
+    // Also delete tasks in that list
+    setTasks((prev) => prev.filter((task) => task.category !== id));
+  };
+
   const addList = (name: string, color: string) => {
     const newList: TodoList = {
       id: uuidv4(),
@@ -69,5 +81,7 @@ export function useTasks() {
     toggleTaskCompletion,
     deleteTask,
     addList,
+    updateList,
+    deleteList,
   };
 }

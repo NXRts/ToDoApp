@@ -1,4 +1,4 @@
-import { Search, Menu, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut } from 'lucide-react';
+import { Search, Menu, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut, Edit2, Trash2 } from 'lucide-react';
 import { TodoList, Tag, ViewMode, Task } from '@/types/todo';
 import { twMerge } from 'tailwind-merge';
 import { useState } from 'react';
@@ -12,10 +12,13 @@ interface SidebarProps {
   selectedListId: string | null;
   onListSelect: (id: string | null) => void;
   onAddList: (name: string, color: string) => void;
+  onUpdateList: (id: string, name: string, color: string) => void;
+  onDeleteList: (id: string) => void;
 }
 
-export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selectedListId, onListSelect, onAddList }: SidebarProps) {
+export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selectedListId, onListSelect, onAddList, onUpdateList, onDeleteList }: SidebarProps) {
   const [isAddingList, setIsAddingList] = useState(false);
+  const [editingListId, setEditingListId] = useState<string | null>(null);
   const [newListName, setNewListName] = useState('');
   const [newListColor, setNewListColor] = useState('bg-blue-500');
 
@@ -29,6 +32,28 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
       onAddList(newListName.trim(), newListColor);
       setNewListName('');
       setIsAddingList(false);
+    }
+  };
+
+  const handleStartEdit = (list: TodoList) => {
+    setEditingListId(list.id);
+    setNewListName(list.name);
+    setNewListColor(list.color);
+  };
+
+  const handleUpdateList = () => {
+    if (editingListId && newListName.trim()) {
+      onUpdateList(editingListId, newListName.trim(), newListColor);
+      setEditingListId(null);
+      setNewListName('');
+    }
+  };
+
+  const handleDeleteList = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this list and all its tasks?')) {
+      onDeleteList(id);
+      if (selectedListId === id) onListSelect(null);
     }
   };
 
@@ -121,12 +146,61 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
         <ul className="space-y-1">
           {lists.map(list => {
             const taskCount = tasks.filter(t => t.category === list.id).length;
+            const isEditing = editingListId === list.id;
+
+            if (isEditing) {
+              return (
+                <li key={list.id} className="animate-in fade-in slide-in-from-top-1 duration-200 py-2">
+                  <div className="bg-muted/30 border border-border rounded-xl p-3 space-y-3">
+                    <div className="flex items-center gap-3 bg-background border border-border rounded-lg px-3 py-2">
+                      <div className={twMerge("w-3 h-3 rounded-[4px] shrink-0", newListColor)}></div>
+                      <input 
+                        autoFocus
+                        type="text" 
+                        value={newListName}
+                        onChange={(e) => setNewListName(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleUpdateList()}
+                        className="w-full bg-transparent border-none text-sm focus:outline-none"
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-2 px-1">
+                      {colors.map(color => (
+                        <button
+                          key={color}
+                          onClick={() => setNewListColor(color)}
+                          className={twMerge(
+                            "w-4 h-4 rounded-[4px] transition-all hover:scale-110",
+                            color,
+                            newListColor === color ? "ring-2 ring-foreground ring-offset-2 ring-offset-muted/30 scale-110" : ""
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={handleUpdateList}
+                        className="flex-1 bg-foreground text-background text-[10px] font-bold py-1.5 rounded-md"
+                      >
+                        Update
+                      </button>
+                      <button 
+                        onClick={() => setEditingListId(null)}
+                        className="flex-1 bg-muted text-muted-foreground text-[10px] font-bold py-1.5 rounded-md"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              );
+            }
+
             return (
-              <li key={list.id}>
+              <li key={list.id} className="group relative">
                 <button
                   onClick={() => { onListSelect(list.id); onViewChange('list'); }}
                   className={twMerge(
-                    "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors group",
+                    "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
                     selectedListId === list.id ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -134,9 +208,25 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
                     <div className={twMerge("w-3 h-3 rounded-[4px]", list.color)}></div>
                     <span>{list.name}</span>
                   </div>
-                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md font-bold opacity-70 group-hover:opacity-100 transition-opacity">
-                    {taskCount}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md font-bold opacity-70 group-hover:hidden transition-opacity">
+                      {taskCount}
+                    </span>
+                    <div className="hidden group-hover:flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleStartEdit(list); }}
+                        className="p-1 hover:bg-background rounded-md text-muted-foreground hover:text-blue-500 transition-colors"
+                      >
+                        <Edit2 size={12} />
+                      </button>
+                      <button 
+                        onClick={(e) => handleDeleteList(e, list.id)}
+                        className="p-1 hover:bg-background rounded-md text-muted-foreground hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </div>
                 </button>
               </li>
             );
