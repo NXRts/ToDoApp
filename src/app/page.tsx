@@ -28,16 +28,28 @@ export default function Home() {
     return tasks.filter(task => {
       const deadlineDate = task.deadline ? parseISO(task.deadline) : null;
       const createdDate = parseISO(task.createdAt);
-      
+      const isCompleted = task.isCompleted;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0); // Start of today
+
       if (currentView === 'today') {
-        return (deadlineDate && isToday(deadlineDate)) || (!deadlineDate && isToday(createdDate));
+        // Show tasks due today OR uncompleted tasks from the past
+        if (deadlineDate) {
+          return isToday(deadlineDate) || (!isCompleted && deadlineDate < now);
+        }
+        // If no deadline, show if created today OR uncompleted from past
+        return isToday(createdDate) || (!isCompleted && createdDate < now);
       }
       
       if (currentView === 'upcoming') {
+        // Show tasks with future deadlines
         if (deadlineDate) {
-          // Show tasks for today, tomorrow, and anything in the next 7 days
-          return isToday(deadlineDate) || isTomorrow(deadlineDate) || (deadlineDate >= new Date() && deadlineDate <= new Date(new Date().setDate(new Date().getDate() + 7)));
+          const sevenDaysLater = new Date(now);
+          sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
+          return deadlineDate >= now && deadlineDate <= sevenDaysLater;
         }
+        // For tasks without deadline in Upcoming, maybe only show today's? 
+        // Or show them in Sticky Wall instead. Let's keep it simple.
         return isToday(createdDate); 
       }
       
