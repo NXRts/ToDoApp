@@ -210,17 +210,17 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
                         className="w-full bg-transparent border-none text-sm font-medium focus:outline-none placeholder:text-muted-foreground/30"
                       />
                     </div>
-                    <div className="grid grid-cols-4 gap-2 px-1">
+                    <div className="grid grid-cols-4 gap-2">
                       {listColors.map(color => (
                         <button
                           key={color}
                           onClick={() => setNewListColor(color)}
                           className={twMerge(
-                            "p-1.5 rounded-lg transition-all",
-                            newListColor === color ? "bg-muted border border-border/40" : "hover:bg-muted/50 border border-transparent"
+                            "aspect-square rounded-xl transition-all",
+                            newListColor === color ? "p-1 bg-muted border border-border/40 scale-105" : "p-0.5 hover:bg-muted/50 border border-transparent"
                           )}
                         >
-                          <div className={twMerge("w-full aspect-square rounded-[5px]", color)}></div>
+                          <div className={twMerge("w-full h-full rounded-lg", color)}></div>
                         </button>
                       ))}
                     </div>
@@ -305,17 +305,17 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
                     className="w-full bg-transparent border-none text-sm font-medium focus:outline-none placeholder:text-muted-foreground/30"
                   />
                 </div>
-                <div className="grid grid-cols-4 gap-2 px-1">
+                <div className="grid grid-cols-4 gap-2">
                   {listColors.map(color => (
                     <button
                       key={color}
                       onClick={() => setNewListColor(color)}
                       className={twMerge(
-                        "p-1.5 rounded-lg transition-all",
-                        newListColor === color ? "bg-muted border border-border/40" : "hover:bg-muted/50 border border-transparent"
+                        "aspect-square rounded-xl transition-all",
+                        newListColor === color ? "p-1 bg-muted border border-border/40 scale-105" : "p-0.5 hover:bg-muted/50 border border-transparent"
                       )}
                     >
-                      <div className={twMerge("w-full aspect-square rounded-[5px]", color)}></div>
+                      <div className={twMerge("w-full h-full rounded-lg", color)}></div>
                     </button>
                   ))}
                 </div>
