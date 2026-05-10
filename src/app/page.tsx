@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTasks } from '@/hooks/useTasks';
 import { Sidebar } from '@/components/Sidebar';
 import { TaskInput } from '@/components/TaskInput';
@@ -18,6 +18,43 @@ export default function Home() {
   const [currentView, setCurrentView] = useState<ViewMode>('today');
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
+  // Apply Settings globally
+  useEffect(() => {
+    const applySettings = () => {
+      const appearance = JSON.parse(localStorage.getItem('todo_appearance') || '{"theme": "system", "glassmorphism": true, "compact": false}');
+      const root = window.document.documentElement;
+      
+      // Theme
+      if (appearance.theme === 'dark') {
+        root.classList.add('dark');
+      } else if (appearance.theme === 'light') {
+        root.classList.remove('dark');
+      } else {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.classList.toggle('dark', isDark);
+      }
+
+      // Glassmorphism
+      if (appearance.glassmorphism) {
+        root.classList.add('glass-enabled');
+      } else {
+        root.classList.remove('glass-enabled');
+      }
+
+      // Compact
+      if (appearance.compact) {
+        root.classList.add('compact-mode');
+      } else {
+        root.classList.remove('compact-mode');
+      }
+    };
+
+    applySettings();
+    // Listen for storage changes (in case settings are changed in another tab or the same page)
+    window.addEventListener('storage', applySettings);
+    return () => window.removeEventListener('storage', applySettings);
+  }, []);
 
   // Filter tasks based on view or list
   const filteredTasks = useMemo(() => {

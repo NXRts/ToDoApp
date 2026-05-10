@@ -35,11 +35,14 @@ export function SettingsView() {
     const root = window.document.documentElement;
     if (appearance.theme === 'dark') {
       root.classList.add('dark');
+      localStorage.theme = 'dark';
     } else if (appearance.theme === 'light') {
       root.classList.remove('dark');
+      localStorage.theme = 'light';
     } else {
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       root.classList.toggle('dark', isDark);
+      localStorage.removeItem('theme'); // Reset to system
     }
 
     // Apply Glassmorphism
