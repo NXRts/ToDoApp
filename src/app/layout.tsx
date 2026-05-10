@@ -29,9 +29,12 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                if (localStorage.theme === 'dark') {
                   document.documentElement.classList.add('dark')
+                } else if (localStorage.theme === 'light') {
+                  document.documentElement.classList.remove('dark')
                 } else {
+                  // Default to Light even if no setting is found
                   document.documentElement.classList.remove('dark')
                 }
               } catch (_) {}

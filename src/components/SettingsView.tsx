@@ -14,8 +14,8 @@ export function SettingsView() {
   });
 
   const [appearance, setAppearance] = useState(() => {
-    if (typeof window === 'undefined') return { theme: 'system', glassmorphism: true, compact: false };
-    return JSON.parse(localStorage.getItem('todo_appearance') || '{"theme": "system", "glassmorphism": true, "compact": false}');
+    if (typeof window === 'undefined') return { theme: 'light', glassmorphism: true, compact: false };
+    return JSON.parse(localStorage.getItem('todo_appearance') || '{"theme": "light", "glassmorphism": true, "compact": false}');
   });
 
   const [notifications, setNotifications] = useState(() => {

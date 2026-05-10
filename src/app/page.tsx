@@ -22,7 +22,7 @@ export default function Home() {
   // Apply Settings globally
   useEffect(() => {
     const applySettings = () => {
-      const appearance = JSON.parse(localStorage.getItem('todo_appearance') || '{"theme": "system", "glassmorphism": true, "compact": false}');
+      const appearance = JSON.parse(localStorage.getItem('todo_appearance') || '{"theme": "light", "glassmorphism": true, "compact": false}');
       const root = window.document.documentElement;
       
       // Theme

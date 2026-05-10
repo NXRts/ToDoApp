@@ -197,10 +197,10 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
 
             return (
               <li key={list.id} className="group relative">
-                <button
+                <div
                   onClick={() => { onListSelect(list.id); onViewChange('list'); }}
                   className={twMerge(
-                    "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
+                    "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors cursor-pointer",
                     selectedListId === list.id ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -227,7 +227,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
                       </button>
                     </div>
                   </div>
-                </button>
+                </div>
               </li>
             );
           })}
