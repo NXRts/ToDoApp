@@ -50,6 +50,33 @@ export function useTasks() {
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
   };
 
+  const addTag = (name: string, color: string) => {
+    const newTag: Tag = {
+      id: uuidv4(),
+      name,
+      color,
+    };
+    setTags((prev) => [...prev, newTag]);
+    return newTag.id;
+  };
+
+  const updateTag = (id: string, name: string, color: string) => {
+    setTags((prev) =>
+      prev.map((tag) => (tag.id === id ? { ...tag, name, color } : tag))
+    );
+  };
+
+  const deleteTag = (id: string) => {
+    setTags((prev) => prev.filter((tag) => tag.id !== id));
+    // Remove tag from all tasks
+    setTasks((prev) =>
+      prev.map((task) => ({
+        ...task,
+        tags: task.tags.filter((tId) => tId !== id),
+      }))
+    );
+  };
+
   const updateList = (id: string, name: string, color: string) => {
     setLists((prev) =>
       prev.map((list) => (list.id === id ? { ...list, name, color } : list))
@@ -83,5 +110,8 @@ export function useTasks() {
     addList,
     updateList,
     deleteList,
+    addTag,
+    updateTag,
+    deleteTag,
   };
 }
