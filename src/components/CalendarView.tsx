@@ -287,8 +287,8 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
                   className="absolute left-0 right-0 z-10 flex items-center pointer-events-none"
                   style={{ top: `${currentTimePosition}px` }}
                 >
-                  <div className="w-2.5 h-2.5 rounded-full bg-foreground -ml-[5px]" />
-                  <div className="flex-1 h-[1px] bg-foreground" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-foreground ml-[-5px]" />
+                  <div className="flex-1 h-px bg-foreground" />
                 </div>
               )}
 

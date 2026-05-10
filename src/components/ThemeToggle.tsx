@@ -33,7 +33,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full bg-card border border-border text-foreground hover:bg-input transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-(--accent) focus:ring-offset-2"
       aria-label="Toggle Dark Mode"
     >
       <motion.div
