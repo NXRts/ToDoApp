@@ -44,6 +44,7 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
   // Get start of week (Monday)
   const startOfCurrentWeek = useMemo(() => {
     const d = new Date(currentDate);
+    d.setHours(0, 0, 0, 0); // Normalize to start of day
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     return new Date(d.setDate(diff));
@@ -62,6 +63,7 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
     const startDay = startOfMonth.getDay();
     const diff = startOfMonth.getDate() - startDay + (startDay === 0 ? -6 : 1);
     const calendarStart = new Date(new Date(startOfMonth).setDate(diff));
+    calendarStart.setHours(0, 0, 0, 0);
     
     // Create a 6-week (42 day) grid to ensure we cover all possibilities
     return Array.from({ length: 42 }, (_, i) => addDays(calendarStart, i));
@@ -71,12 +73,19 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
     return tasks.filter(task => {
       if (!task.deadline) return false;
       const d = parseISO(task.deadline);
-      if (viewMode === 'Day') return isSameDay(d, currentDate);
-      if (viewMode === 'Week') return d >= startOfCurrentWeek && d <= addDays(startOfCurrentWeek, 6);
+      const taskDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      
+      if (viewMode === 'Day') return isSameDay(taskDate, currentDate);
+      
+      if (viewMode === 'Week') {
+        const start = new Date(startOfCurrentWeek);
+        const end = addDays(start, 7); // Exclusive end or use endOfDay on day 6
+        return d >= start && d < end;
+      }
       
       const firstVisible = monthDays[0];
-      const lastVisible = monthDays[41];
-      return d >= firstVisible && d <= lastVisible;
+      const lastVisible = addDays(monthDays[41], 1);
+      return d >= firstVisible && d < lastVisible;
     });
   }, [tasks, currentDate, startOfCurrentWeek, monthDays, viewMode]);
 
