@@ -22,7 +22,7 @@ export default function AuthPage() {
               Productive Mind
             </h2>
             <p className="text-muted-foreground text-sm leading-relaxed px-4">
-              With only the features you need, Organic Mind is customized for individuals seeking a stress-free way to stay focused on their goals, projects, and tasks.
+              With only the features you need, ToDo Mind is customized for individuals seeking a stress-free way to stay focused on their goals, projects, and tasks.
             </p>
           </div>
 

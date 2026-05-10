@@ -8,7 +8,7 @@ export function AuthSidebar() {
       {/* Brand */}
       <div className="z-10">
         <h1 className="text-white text-4xl font-black leading-tight tracking-tighter">
-          Organic<br />Mind
+          ToDo<br />Mind
         </h1>
       </div>
 

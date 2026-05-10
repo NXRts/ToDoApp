@@ -26,7 +26,7 @@ export default function RegisterPage() {
               Create account
             </h2>
             <p className="text-muted-foreground text-sm font-medium">
-              Join Organic Mind and start your productive journey.
+              Join ToDo Mind and start your productive journey.
             </p>
           </div>
 
@@ -35,7 +35,7 @@ export default function RegisterPage() {
               <input 
                 type="text" 
                 placeholder="Full Name"
-                className="w-full bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl py-4 px-5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700] transition-all placeholder:text-muted-foreground/40"
+                className="w-full bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl py-4 px-5 text-sm font-medium text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700] transition-all placeholder:text-[#121212]/30"
               />
             </div>
 
@@ -43,7 +43,7 @@ export default function RegisterPage() {
               <input 
                 type="email" 
                 placeholder="Email Address"
-                className="w-full bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl py-4 px-5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700] transition-all placeholder:text-muted-foreground/40"
+                className="w-full bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl py-4 px-5 text-sm font-medium text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700] transition-all placeholder:text-[#121212]/30"
               />
             </div>
             
@@ -51,7 +51,7 @@ export default function RegisterPage() {
               <input 
                 type={showPassword ? "text" : "password"} 
                 placeholder="Create Password"
-                className="w-full bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl py-4 px-5 pr-12 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700] transition-all placeholder:text-muted-foreground/40"
+                className="w-full bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl py-4 px-5 pr-12 text-sm font-medium text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700] transition-all placeholder:text-[#121212]/30"
               />
               <button 
                 type="button"
