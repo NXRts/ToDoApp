@@ -28,7 +28,7 @@ export function AuthSidebar() {
             initial={{ opacity: 0, scale: 0.8, x: 20 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="absolute top-[35%] right-[10%] w-36 h-36 bg-[#E67E22] rounded-[60%_40%_30%_70% / 50%_50%_60%_40%] rotate-[15deg]"
+            className="absolute top-[35%] right-[10%] w-36 h-36 bg-[#E67E22] rounded-[60%_40%_30%_70% / 50%_50%_60%_40%] rotate-15"
           />
 
           {/* Yellow Shape Bottom */}
@@ -86,7 +86,7 @@ export function AuthSidebar() {
       </div>
 
       {/* Subtle Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-tr from-black/20 to-transparent pointer-events-none" />
     </div>
   );
 }
