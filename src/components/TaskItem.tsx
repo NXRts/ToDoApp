@@ -57,11 +57,11 @@ export function TaskItem({ task, onToggle, listDetails, onClick, isSelected }: T
             )}
             
             {task.subtasks && task.subtasks.length > 0 && (
-              <span className="flex items-center gap-1.5 text-muted-foreground border border-border px-2 py-0.5 rounded-md bg-muted/50">
-                <span className="w-4 h-4 bg-border/80 text-[10px] rounded-sm flex items-center justify-center text-foreground font-bold">
-                  {task.subtasks.length}
+              <span className="flex items-center gap-2 text-muted-foreground border border-border/60 px-2 py-1 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                <span className="flex items-center justify-center bg-foreground text-background font-black text-[9px] min-w-[24px] h-4 rounded-full px-1">
+                  {task.subtasks.filter(s => s.isCompleted).length}/{task.subtasks.length}
                 </span>
-                Subtasks
+                <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Subtasks</span>
               </span>
             )}
 

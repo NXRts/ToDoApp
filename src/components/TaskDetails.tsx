@@ -54,16 +54,26 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
   const handleAddSubtask = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!newSubtaskTitle.trim()) return;
-    setSubtasks([...subtasks, { id: uuidv4(), title: newSubtaskTitle.trim(), isCompleted: false }]);
+    const newSubtask = { id: uuidv4(), title: newSubtaskTitle.trim(), isCompleted: false };
+    const updatedSubtasks = [...subtasks, newSubtask];
+    setSubtasks(updatedSubtasks);
     setNewSubtaskTitle('');
+    // Auto-save subtask addition
+    onSave(task.id, { subtasks: updatedSubtasks });
   };
 
   const toggleSubtask = (subId: string) => {
-    setSubtasks(subtasks.map(st => st.id === subId ? { ...st, isCompleted: !st.isCompleted } : st));
+    const updatedSubtasks = subtasks.map(st => st.id === subId ? { ...st, isCompleted: !st.isCompleted } : st);
+    setSubtasks(updatedSubtasks);
+    // Auto-save toggle
+    onSave(task.id, { subtasks: updatedSubtasks });
   };
 
   const deleteSubtask = (subId: string) => {
-    setSubtasks(subtasks.filter(st => st.id !== subId));
+    const updatedSubtasks = subtasks.filter(st => st.id !== subId);
+    setSubtasks(updatedSubtasks);
+    // Auto-save deletion
+    onSave(task.id, { subtasks: updatedSubtasks });
   };
 
   const toggleTag = (tagId: string) => {
@@ -282,31 +292,49 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
                 <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
+                    id={`subtask-${st.id}`}
                     checked={st.isCompleted}
                     onChange={() => toggleSubtask(st.id)}
-                    className="w-4 h-4 rounded border-border/50 text-foreground focus:ring-offset-background"
+                    className="w-4 h-4 rounded border-border/50 text-foreground focus:ring-offset-background cursor-pointer"
                   />
-                  <span className={twMerge("text-sm font-medium transition-all", st.isCompleted ? "text-muted-foreground line-through opacity-50" : "text-foreground")}>
+                  <label 
+                    htmlFor={`subtask-${st.id}`}
+                    className={twMerge("text-sm font-medium transition-all cursor-pointer", st.isCompleted ? "text-muted-foreground line-through opacity-50" : "text-foreground")}
+                  >
                     {st.title}
-                  </span>
+                  </label>
                 </div>
                 <button 
                   onClick={() => deleteSubtask(st.id)}
                   className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded-md text-muted-foreground hover:text-red-500 transition-all"
+                  title="Delete subtask"
                 >
                   <Trash2 size={14} />
                 </button>
               </li>
             ))}
+            {subtasks.length === 0 && (
+              <p className="text-[11px] text-muted-foreground/50 italic px-1">No subtasks yet...</p>
+            )}
           </ul>
 
-          <div className="flex items-center gap-3 bg-muted/10 border border-border/30 rounded-xl px-4 py-2 hover:bg-muted/20 transition-colors">
-            <Plus size={16} className="text-muted-foreground" />
+          <div className="flex items-center gap-3 bg-muted/10 border border-border/30 rounded-xl px-4 py-2 hover:bg-muted/20 transition-colors focus-within:border-foreground/20">
+            <button 
+              onClick={() => handleAddSubtask()}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Plus size={16} />
+            </button>
             <input
               type="text"
               value={newSubtaskTitle}
               onChange={(e) => setNewSubtaskTitle(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddSubtask()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddSubtask();
+                }
+              }}
               placeholder="Add New Subtask"
               className="flex-1 bg-transparent border-none outline-none text-sm font-medium placeholder:text-muted-foreground/30 text-foreground"
             />
