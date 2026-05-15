@@ -92,11 +92,62 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTra
         </button>
       </div>
 
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5">
+          <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-1">Current Streak</p>
+          <h3 className="text-3xl font-black text-indigo-600">12 Days</h3>
+        </div>
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5">
+          <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Completion Rate</p>
+          <h3 className="text-3xl font-black text-emerald-600">84%</h3>
+        </div>
+        <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-5">
+          <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest mb-1">Best Habit</p>
+          <h3 className="text-3xl font-black text-orange-600">Meditation</h3>
+        </div>
+      </div>
+
       {/* Habit Table Container */}
       <div className="bg-card border border-border rounded-none overflow-hidden shadow-sm">
         <div className="overflow-x-auto custom-scrollbar pb-4">
           <table className="w-full text-left border-collapse min-w-max">
             <thead>
+              {/* Chart Row */}
+              <tr className="bg-card">
+                <th className="p-4 px-4 border-r border-border/50 sticky left-0 z-20 bg-card align-bottom">
+                  <div className="flex flex-col justify-end h-full">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Performance Chart</span>
+                    <span className="text-xs font-black">{habits.length} Total Habits</span>
+                  </div>
+                </th>
+                {datesToRender.map(day => {
+                  const dateStr = format(day, 'yyyy-MM-dd');
+                  const completedCount = habits.filter(h => h.logs.find(l => l.date === dateStr)?.completed).length;
+                  const maxCount = Math.max(habits.length, 1);
+                  const heightPercentage = (completedCount / maxCount) * 100;
+                  const isTodayMarker = isSameDay(day, new Date());
+
+                  return (
+                    <th key={`chart-${dateStr}`} className="p-0 border-b border-r border-border/30 align-bottom h-[100px] min-w-[28px] w-[28px]">
+                      <div className="w-full h-full flex items-end justify-center pt-4 pb-2 group relative">
+                        {/* Tooltip */}
+                        <div className="absolute -top-1 opacity-0 group-hover:opacity-100 transition-opacity bg-foreground text-background text-[10px] font-bold py-0.5 px-1.5 rounded-none pointer-events-none z-30 whitespace-nowrap">
+                          {completedCount}/{habits.length}
+                        </div>
+                        {/* Bar */}
+                        <div 
+                          className={twMerge(
+                            "w-[12px] rounded-none transition-all duration-500",
+                            isTodayMarker ? "bg-emerald-500" : (completedCount === habits.length && habits.length > 0) ? "bg-indigo-500" : "bg-emerald-500/20 group-hover:bg-emerald-500/50"
+                          )}
+                          style={{ height: `${Math.max(heightPercentage, 4)}%` }}
+                        ></div>
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
               {/* First Header Row (Days / Names) */}
               <tr className="bg-emerald-600">
                 <th className="p-3 px-4 text-[11px] font-bold text-white uppercase tracking-widest border-r border-emerald-700/50 min-w-[180px] w-[180px] sticky left-0 z-20 bg-emerald-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
@@ -168,22 +219,6 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTra
               )}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
-        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-3xl p-6">
-          <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Current Streak</p>
-          <h3 className="text-3xl font-black text-indigo-600">12 Days</h3>
-        </div>
-        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-3xl p-6">
-          <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-1">Completion Rate</p>
-          <h3 className="text-3xl font-black text-emerald-600">84%</h3>
-        </div>
-        <div className="bg-orange-500/10 border border-orange-500/20 rounded-3xl p-6">
-          <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-1">Best Habit</p>
-          <h3 className="text-3xl font-black text-orange-600">Meditation</h3>
         </div>
       </div>
     </div>
