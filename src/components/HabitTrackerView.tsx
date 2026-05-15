@@ -3,7 +3,7 @@
 import { Habit } from '@/types/todo';
 import { Plus, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useState } from 'react';
-import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
+import { format, addDays, startOfWeek, isSameDay, startOfMonth, getDaysInMonth, addMonths, subMonths, addWeeks, subWeeks } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
 
 interface HabitTrackerViewProps {
@@ -12,36 +12,77 @@ interface HabitTrackerViewProps {
   onAddHabit: () => void;
 }
 
-export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTrackerViewProps) {
-  const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  
-  const weekDays = Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
+type TrackerViewMode = 'daily' | 'weekly' | 'monthly';
 
-  const navigateWeek = (direction: number) => {
-    setWeekStart(prev => addDays(prev, direction * 7));
+export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTrackerViewProps) {
+  const [viewMode, setViewMode] = useState<TrackerViewMode>('monthly');
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  // Determine dates based on view mode
+  let datesToRender: Date[] = [];
+  let headerTitle = '';
+
+  if (viewMode === 'daily') {
+    datesToRender = [currentDate];
+    headerTitle = format(currentDate, 'MMMM d, yyyy');
+  } else if (viewMode === 'weekly') {
+    const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+    datesToRender = Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
+    headerTitle = `${format(weekStart, 'MMM dd')} - ${format(addDays(weekStart, 6), 'MMM dd, yyyy')}`;
+  } else if (viewMode === 'monthly') {
+    const monthStart = startOfMonth(currentDate);
+    const daysInMonth = getDaysInMonth(currentDate);
+    datesToRender = Array.from({ length: daysInMonth }).map((_, i) => addDays(monthStart, i));
+    headerTitle = format(currentDate, 'MMMM yyyy');
+  }
+
+  const navigateDate = (direction: number) => {
+    if (viewMode === 'daily') {
+      setCurrentDate(prev => addDays(prev, direction));
+    } else if (viewMode === 'weekly') {
+      setCurrentDate(prev => direction > 0 ? addWeeks(prev, 1) : subWeeks(prev, 1));
+    } else if (viewMode === 'monthly') {
+      setCurrentDate(prev => direction > 0 ? addMonths(prev, 1) : subMonths(prev, 1));
+    }
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-2">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500 pb-12">
+      {/* Header Controls */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-2">
+        <div className="flex items-center gap-4 bg-muted/30 p-1.5 rounded-2xl border border-border/50">
+          {(['daily', 'weekly', 'monthly'] as TrackerViewMode[]).map(mode => (
+            <button
+              key={mode}
+              onClick={() => setViewMode(mode)}
+              className={twMerge(
+                "px-4 py-2 rounded-xl text-sm font-bold capitalize transition-all",
+                viewMode === mode ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => navigateWeek(-1)}
+            onClick={() => navigateDate(-1)}
             className="p-2 hover:bg-muted rounded-xl transition-colors border border-border/50"
           >
             <ChevronLeft size={20} />
           </button>
           <h2 className="text-lg font-bold min-w-[200px] text-center">
-            {format(weekStart, 'MMM dd')} - {format(addDays(weekStart, 6), 'MMM dd, yyyy')}
+            {headerTitle}
           </h2>
           <button 
-            onClick={() => navigateWeek(1)}
+            onClick={() => navigateDate(1)}
             className="p-2 hover:bg-muted rounded-xl transition-colors border border-border/50"
           >
             <ChevronRight size={20} />
           </button>
         </div>
+
         <button 
           onClick={onAddHabit}
           className="flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-lg active:scale-95"
@@ -51,24 +92,30 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTra
         </button>
       </div>
 
-      {/* Habit Table */}
-      <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      {/* Habit Table Container */}
+      <div className="bg-card border border-border rounded-none overflow-hidden shadow-sm">
+        <div className="overflow-x-auto custom-scrollbar pb-4">
+          <table className="w-full text-left border-collapse min-w-max">
             <thead>
-              <tr className="bg-muted/30">
-                <th className="p-6 text-xs font-bold text-muted-foreground uppercase tracking-widest border-b border-border w-[250px]">Habit</th>
-                {weekDays.map(day => (
-                  <th key={day.toISOString()} className="p-4 text-center border-b border-border">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">{format(day, 'EEE')}</span>
-                      <span className={twMerge(
-                        "w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold",
-                        isSameDay(day, new Date()) ? "bg-foreground text-background" : "text-foreground"
-                      )}>
-                        {format(day, 'd')}
-                      </span>
-                    </div>
+              {/* First Header Row (Days / Names) */}
+              <tr className="bg-emerald-600">
+                <th className="p-3 px-4 text-[11px] font-bold text-white uppercase tracking-widest border-r border-emerald-700/50 min-w-[180px] w-[180px] sticky left-0 z-20 bg-emerald-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                  {viewMode === 'monthly' ? format(currentDate, 'MMMM') : 'HABIT'}
+                </th>
+                {datesToRender.map(day => (
+                  <th key={`header1-${day.toISOString()}`} className="p-1 text-center border-r border-emerald-700/50 text-white min-w-[28px] w-[28px]">
+                    <span className="text-[11px] font-black">{format(day, 'd')}</span>
+                  </th>
+                ))}
+              </tr>
+              {/* Second Header Row (Weekdays) */}
+              <tr className="bg-emerald-500/20">
+                <th className="p-1 px-4 border-b border-r border-emerald-500/30 sticky left-0 z-20 bg-emerald-500/10 backdrop-blur-md"></th>
+                {datesToRender.map(day => (
+                  <th key={`header2-${day.toISOString()}`} className="p-0.5 text-center border-b border-r border-emerald-500/30">
+                    <span className="text-[8px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-tighter">
+                      {format(day, 'EEE')}
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -76,36 +123,37 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTra
             <tbody className="divide-y divide-border">
               {habits.map(habit => (
                 <tr key={habit.id} className="group hover:bg-muted/10 transition-colors">
-                  <td className="p-6 border-r border-border/50">
-                    <div className="flex items-center gap-4">
-                      <div className={twMerge("w-10 h-10 rounded-2xl flex items-center justify-center text-xl shadow-sm", habit.color)}>
+                  <td className="p-2 px-4 border-r border-border/50 sticky left-0 z-10 bg-card group-hover:bg-muted/5 transition-colors shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                    <div className="flex items-center gap-3">
+                      <div className={twMerge("w-7 h-7 rounded-none flex items-center justify-center text-sm shadow-sm shrink-0", habit.color)}>
                         {habit.icon}
                       </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-sm text-foreground">{habit.name}</span>
-                        <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">
-                          {habit.frequency} • Goal: {habit.goal}/7
-                        </span>
-                      </div>
+                      <span className="font-bold text-xs text-foreground truncate max-w-[120px]">{habit.name}</span>
                     </div>
                   </td>
-                  {weekDays.map(day => {
+                  {datesToRender.map(day => {
                     const dateStr = format(day, 'yyyy-MM-dd');
                     const isCompleted = habit.logs.find(l => l.date === dateStr)?.completed;
+                    const isTodayMarker = isSameDay(day, new Date());
                     
                     return (
-                      <td key={dateStr} className="p-4 text-center">
-                        <button
-                          onClick={() => onToggleHabit(habit.id, dateStr)}
-                          className={twMerge(
-                            "w-10 h-10 rounded-2xl border-2 transition-all flex items-center justify-center group/check",
-                            isCompleted 
-                              ? twMerge(habit.color, "border-transparent text-white shadow-md scale-105") 
-                              : "border-border/50 hover:border-foreground/20 bg-transparent text-transparent hover:text-muted-foreground/30"
-                          )}
-                        >
-                          <Check size={20} className={twMerge("transition-transform", isCompleted ? "scale-100" : "scale-0 group-hover/check:scale-100")} strokeWidth={4} />
-                        </button>
+                      <td key={dateStr} className={twMerge(
+                        "p-1 text-center border-r border-border/30",
+                        isTodayMarker ? "bg-muted/30" : ""
+                      )}>
+                        <div className="flex items-center justify-center">
+                          <button
+                            onClick={() => onToggleHabit(habit.id, dateStr)}
+                            className={twMerge(
+                              "w-5 h-5 rounded-none border-[1.5px] transition-all flex items-center justify-center group/check mx-auto",
+                              isCompleted 
+                                ? "bg-emerald-500 border-emerald-500 text-white shadow-sm" 
+                                : "border-border/60 hover:border-emerald-500/50 bg-transparent text-transparent hover:text-emerald-500/30"
+                            )}
+                          >
+                            <Check size={12} className={twMerge("transition-transform", isCompleted ? "scale-100" : "scale-0 group-hover/check:scale-100")} strokeWidth={4} />
+                          </button>
+                        </div>
                       </td>
                     );
                   })}
@@ -113,7 +161,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTra
               ))}
               {habits.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="p-20 text-center text-muted-foreground italic">
+                  <td colSpan={datesToRender.length + 1} className="p-20 text-center text-muted-foreground italic sticky left-0">
                     No habits tracked yet. Start your first one today!
                   </td>
                 </tr>
