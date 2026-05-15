@@ -9,13 +9,21 @@ import { TaskDetails } from '@/components/TaskDetails';
 import { CalendarView } from '@/components/CalendarView';
 import { StickyWall } from '@/components/StickyWall';
 import { SettingsView } from '@/components/SettingsView';
+import { DashboardView } from '@/components/DashboardView';
+import { HabitTrackerView } from '@/components/HabitTrackerView';
 import { ViewMode } from '@/types/todo';
 import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns';
 
 export default function Home() {
-  const { tasks, lists, tags, addTask, toggleTaskCompletion, updateTask, deleteTask, addList, updateList, deleteList, addTag, updateTag, deleteTag } = useTasks();
+  const { 
+    tasks, lists, tags, habits,
+    addTask, toggleTaskCompletion, updateTask, deleteTask, 
+    addList, updateList, deleteList, 
+    addTag, updateTag, deleteTag,
+    addHabit, updateHabit, deleteHabit, toggleHabitLog
+  } = useTasks();
   
-  const [currentView, setCurrentView] = useState<ViewMode>('today');
+  const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
@@ -101,6 +109,8 @@ export default function Home() {
       return list ? list.name : 'List';
     }
     switch (currentView) {
+      case 'dashboard': return 'Dashboard';
+      case 'habits': return 'Habit Tracker';
       case 'upcoming': return 'Upcoming';
       case 'today': return 'Today';
       case 'calendar': return 'Calendar';
@@ -136,13 +146,32 @@ export default function Home() {
         <header className="flex items-center gap-4 mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">{headerTitle}</h1>
           <div className="flex items-center justify-center min-w-8 h-8 px-2 rounded-lg border border-border text-foreground font-bold text-xl">
-            {filteredTasks.length}
+            {currentView === 'dashboard' ? (tasks.filter(t => !t.isCompleted).length) : 
+             currentView === 'habits' ? habits.length : 
+             filteredTasks.length}
           </div>
         </header>
 
-        {/* Task List */}
+        {/* Dynamic View Content */}
         <div className="flex flex-col">
-          {currentView === 'calendar' ? (
+          {currentView === 'dashboard' ? (
+            <DashboardView 
+              tasks={tasks} 
+              habits={habits} 
+              lists={lists}
+              onTaskToggle={toggleTaskCompletion}
+              onHabitToggle={toggleHabitLog}
+              onNavigate={(view) => { setCurrentView(view); setSelectedListId(null); }}
+            />
+          ) : currentView === 'habits' ? (
+            <HabitTrackerView 
+              habits={habits}
+              onToggleHabit={toggleHabitLog}
+              onAddHabit={() => {
+                const id = addHabit('New Habit', 'bg-blue-500', '✨', 'daily', 7);
+              }}
+            />
+          ) : currentView === 'calendar' ? (
             <CalendarView 
               tasks={tasks} 
               lists={lists} 

@@ -34,4 +34,20 @@ export interface Tag {
   color: string; // hex or tailwind class
 }
 
-export type ViewMode = 'upcoming' | 'today' | 'calendar' | 'sticky-wall' | 'list' | 'settings';
+export interface HabitLog {
+  date: string; // ISO string (Date part)
+  completed: boolean;
+}
+
+export interface Habit {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  frequency: 'daily' | 'weekly';
+  goal: number; // e.g., 5 times a week
+  logs: HabitLog[];
+  createdAt: string;
+}
+
+export type ViewMode = 'dashboard' | 'habits' | 'upcoming' | 'today' | 'calendar' | 'sticky-wall' | 'list' | 'settings';

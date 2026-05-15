@@ -1,5 +1,5 @@
 import { useLocalStorage } from './useLocalStorage';
-import { Task, Priority, TodoList, Tag } from '@/types/todo';
+import { Task, Priority, TodoList, Tag, Habit } from '@/types/todo';
 import { v4 as uuidv4 } from 'uuid';
 
 export function useTasks() {
@@ -99,10 +99,53 @@ export function useTasks() {
     return newList.id;
   };
 
+  const [habits, setHabits] = useLocalStorage<Habit[]>('todo_habits', [
+    { id: 'h1', name: 'Morning Meditation', color: 'bg-indigo-500', icon: '🧘', frequency: 'daily', goal: 7, logs: [], createdAt: new Date().toISOString() },
+    { id: 'h2', name: 'Read 30 mins', color: 'bg-orange-500', icon: '📚', frequency: 'daily', goal: 7, logs: [], createdAt: new Date().toISOString() },
+  ]);
+
+  const addHabit = (name: string, color: string, icon: string, frequency: 'daily' | 'weekly', goal: number) => {
+    const newHabit: Habit = {
+      id: uuidv4(),
+      name,
+      color,
+      icon,
+      frequency,
+      goal,
+      logs: [],
+      createdAt: new Date().toISOString(),
+    };
+    setHabits((prev) => [...prev, newHabit]);
+    return newHabit.id;
+  };
+
+  const updateHabit = (id: string, updates: Partial<Habit>) => {
+    setHabits((prev) => prev.map((h) => (h.id === id ? { ...h, ...updates } : h)));
+  };
+
+  const deleteHabit = (id: string) => {
+    setHabits((prev) => prev.filter((h) => h.id !== id));
+  };
+
+  const toggleHabitLog = (habitId: string, date: string) => {
+    setHabits((prev) => prev.map((h) => {
+      if (h.id !== habitId) return h;
+      const existingLogIndex = h.logs.findIndex(l => l.date === date);
+      let newLogs = [...h.logs];
+      if (existingLogIndex >= 0) {
+        newLogs[existingLogIndex].completed = !newLogs[existingLogIndex].completed;
+      } else {
+        newLogs.push({ date, completed: true });
+      }
+      return { ...h, logs: newLogs };
+    }));
+  };
+
   return {
     tasks,
     lists,
     tags,
+    habits,
     addTask,
     updateTask,
     toggleTaskCompletion,
@@ -113,5 +156,9 @@ export function useTasks() {
     addTag,
     updateTag,
     deleteTag,
+    addHabit,
+    updateHabit,
+    deleteHabit,
+    toggleHabitLog,
   };
 }

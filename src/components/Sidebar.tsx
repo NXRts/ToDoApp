@@ -1,4 +1,4 @@
-import { Search, Menu, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut, Edit2, Trash2, X } from 'lucide-react';
+import { Search, Menu, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut, Edit2, Trash2, X, LayoutDashboard, Activity } from 'lucide-react';
 import { TodoList, Tag, ViewMode, Task } from '@/types/todo';
 import { twMerge } from 'tailwind-merge';
 import { useState } from 'react';
@@ -124,8 +124,43 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
         />
       </div>
 
-      {/* TASKS Section */}
+      {/* OVERVIEW Section */}
       <div className="mb-8">
+        <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-2">Overview</h2>
+        <ul className="space-y-1">
+          <li>
+            <button
+              onClick={() => { onViewChange('dashboard'); onListSelect(null); }}
+              className={twMerge(
+                "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
+                currentView === 'dashboard' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <LayoutDashboard size={16} />
+                <span>Dashboard</span>
+              </div>
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => { onViewChange('habits'); onListSelect(null); }}
+              className={twMerge(
+                "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
+                currentView === 'habits' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <Activity size={16} />
+                <span>Habit Tracker</span>
+              </div>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      {/* TASKS Section */}
+      <div className="mb-8 border-t border-border pt-6">
         <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-2">Tasks</h2>
         <ul className="space-y-1">
           <li>
