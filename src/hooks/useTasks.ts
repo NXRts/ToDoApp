@@ -133,7 +133,7 @@ export function useTasks() {
       const existingLogIndex = h.logs.findIndex(l => l.date === date);
       let newLogs = [...h.logs];
       if (existingLogIndex >= 0) {
-        newLogs[existingLogIndex].completed = !newLogs[existingLogIndex].completed;
+        newLogs.splice(existingLogIndex, 1);
       } else {
         newLogs.push({ date, completed: true });
       }
