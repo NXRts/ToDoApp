@@ -167,9 +167,11 @@ export default function Home() {
             <HabitTrackerView 
               habits={habits}
               onToggleHabit={toggleHabitLog}
-              onAddHabit={() => {
-                const id = addHabit('New Habit', 'bg-blue-500', '✨', 'daily', 7);
+              onAddHabit={(name, color, icon) => {
+                addHabit(name, color, icon, 'daily', 7);
               }}
+              onUpdateHabit={updateHabit}
+              onDeleteHabit={deleteHabit}
             />
           ) : currentView === 'calendar' ? (
             <CalendarView 

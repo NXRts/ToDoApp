@@ -1,7 +1,7 @@
 'use client';
 
 import { Habit } from '@/types/todo';
-import { Plus, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Check, Edit2, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 import { format, addDays, startOfWeek, isSameDay, startOfMonth, getDaysInMonth, addMonths, subMonths, addWeeks, subWeeks } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
@@ -9,14 +9,47 @@ import { twMerge } from 'tailwind-merge';
 interface HabitTrackerViewProps {
   habits: Habit[];
   onToggleHabit: (id: string, date: string) => void;
-  onAddHabit: () => void;
+  onAddHabit: (name: string, color: string, icon: string) => void;
+  onUpdateHabit?: (id: string, updates: Partial<Habit>) => void;
+  onDeleteHabit?: (id: string) => void;
 }
 
 type TrackerViewMode = 'daily' | 'weekly' | 'monthly';
 
-export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTrackerViewProps) {
+const PRESET_COLORS = ['bg-indigo-500', 'bg-emerald-500', 'bg-orange-500', 'bg-blue-500', 'bg-pink-500', 'bg-purple-500'];
+const PRESET_ICONS = ['🧘', '📚', '🏃', '💧', '🥗', '💻', '🎨', '✨'];
+
+type TrackerViewMode = 'daily' | 'weekly' | 'monthly';
+
+export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHabit, onDeleteHabit }: HabitTrackerViewProps) {
   const [viewMode, setViewMode] = useState<TrackerViewMode>('monthly');
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [formData, setFormData] = useState({ name: '', color: PRESET_COLORS[0], icon: PRESET_ICONS[0] });
+
+  const openModal = (habit?: Habit) => {
+    if (habit) {
+      setEditingHabit(habit);
+      setFormData({ name: habit.name, color: habit.color, icon: habit.icon });
+    } else {
+      setEditingHabit(null);
+      setFormData({ name: '', color: PRESET_COLORS[0], icon: PRESET_ICONS[0] });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleSaveHabit = () => {
+    if (!formData.name.trim()) return;
+    if (editingHabit && onUpdateHabit) {
+      onUpdateHabit(editingHabit.id, { name: formData.name, color: formData.color, icon: formData.icon });
+    } else {
+      onAddHabit(formData.name, formData.color, formData.icon);
+    }
+    setIsModalOpen(false);
+  };
 
   // Determine dates based on view mode
   let datesToRender: Date[] = [];
@@ -84,7 +117,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTra
         </div>
 
         <button 
-          onClick={onAddHabit}
+          onClick={() => openModal()}
           className="flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-lg active:scale-95"
         >
           <Plus size={18} />
@@ -173,13 +206,24 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTra
             </thead>
             <tbody className="divide-y divide-border">
               {habits.map(habit => (
-                <tr key={habit.id} className="group hover:bg-muted/10 transition-colors">
-                  <td className="p-2 px-4 border-r border-border/50 sticky left-0 z-10 bg-card group-hover:bg-muted/5 transition-colors shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                <tr key={habit.id} className="group/row hover:bg-muted/10 transition-colors">
+                  <td className="p-2 px-4 border-r border-border/50 sticky left-0 z-10 bg-card group-hover/row:bg-muted/5 transition-colors shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] relative">
                     <div className="flex items-center gap-3">
                       <div className={twMerge("w-7 h-7 rounded-none flex items-center justify-center text-sm shadow-sm shrink-0", habit.color)}>
                         {habit.icon}
                       </div>
-                      <span className="font-bold text-xs text-foreground truncate max-w-[120px]">{habit.name}</span>
+                      <span className="font-bold text-xs text-foreground leading-tight pr-12">{habit.name}</span>
+                    </div>
+                    {/* Action Buttons */}
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity bg-card shadow-sm border border-border/50 rounded-md p-0.5">
+                      <button onClick={() => openModal(habit)} className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground">
+                        <Edit2 size={12} />
+                      </button>
+                      {onDeleteHabit && (
+                        <button onClick={() => onDeleteHabit(habit.id)} className="p-1 hover:bg-red-500/10 rounded text-muted-foreground hover:text-red-500">
+                          <Trash2 size={12} />
+                        </button>
+                      )}
                     </div>
                   </td>
                   {datesToRender.map(day => {
@@ -221,6 +265,75 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit }: HabitTra
           </table>
         </div>
       </div>
+
+      {/* Habit Edit/Add Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in p-4">
+          <div className="bg-card border border-border w-full max-w-md rounded-3xl shadow-2xl p-6 flex flex-col gap-6 scale-in-95 animate-in duration-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-foreground">{editingHabit ? 'Edit Habit' : 'New Habit'}</h3>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-muted rounded-xl text-muted-foreground transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Habit Name</label>
+                <input 
+                  type="text" 
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. Morning Meditation"
+                  className="bg-muted/30 border border-border/50 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Icon</label>
+                <div className="flex flex-wrap gap-2">
+                  {PRESET_ICONS.map(icon => (
+                    <button 
+                      key={icon}
+                      onClick={() => setFormData({ ...formData, icon })}
+                      className={twMerge("w-10 h-10 flex items-center justify-center text-lg rounded-xl border-2 transition-all", formData.icon === icon ? "border-foreground bg-foreground/5 shadow-sm" : "border-border/30 hover:border-border bg-muted/20")}
+                    >
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Color</label>
+                <div className="flex flex-wrap gap-2">
+                  {PRESET_COLORS.map(color => (
+                    <button 
+                      key={color}
+                      onClick={() => setFormData({ ...formData, color })}
+                      className={twMerge("w-8 h-8 rounded-full border-4 transition-all", color, formData.color === color ? "border-background shadow-[0_0_0_2px_currentColor]" : "border-transparent opacity-60 hover:opacity-100")}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-4">
+              <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-sm font-bold text-muted-foreground hover:bg-muted rounded-xl transition-colors">
+                Cancel
+              </button>
+              <button 
+                onClick={handleSaveHabit} 
+                disabled={!formData.name.trim()}
+                className="px-6 py-2.5 bg-foreground text-background text-sm font-bold rounded-xl shadow-lg hover:opacity-90 transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+              >
+                Save Habit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
