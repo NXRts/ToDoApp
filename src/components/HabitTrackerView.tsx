@@ -19,8 +19,6 @@ type TrackerViewMode = 'daily' | 'weekly' | 'monthly';
 const PRESET_COLORS = ['bg-indigo-500', 'bg-emerald-500', 'bg-orange-500', 'bg-blue-500', 'bg-pink-500', 'bg-purple-500'];
 const PRESET_ICONS = ['🧘', '📚', '🏃', '💧', '🥗', '💻', '🎨', '✨'];
 
-type TrackerViewMode = 'daily' | 'weekly' | 'monthly';
-
 export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHabit, onDeleteHabit }: HabitTrackerViewProps) {
   const [viewMode, setViewMode] = useState<TrackerViewMode>('monthly');
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -207,7 +205,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
             <tbody className="divide-y divide-border">
               {habits.map(habit => (
                 <tr key={habit.id} className="group/row hover:bg-muted/10 transition-colors">
-                  <td className="p-2 px-4 border-r border-border/50 sticky left-0 z-10 bg-card group-hover/row:bg-muted/5 transition-colors shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] relative">
+                  <td className="p-2 px-4 border-r border-border/50 sticky left-0 z-10 bg-card group-hover/row:bg-muted/5 transition-colors shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                     <div className="flex items-center gap-3">
                       <div className={twMerge("w-7 h-7 rounded-none flex items-center justify-center text-sm shadow-sm shrink-0", habit.color)}>
                         {habit.icon}
