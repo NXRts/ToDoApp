@@ -6,8 +6,36 @@ import { AuthSidebar } from '@/components/auth/AuthSidebar';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 
+import { useRouter } from 'next/navigation';
+
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+
+  const handleGoogleLogin = () => {
+    const user = {
+      id: 'g-12345',
+      name: 'Google User',
+      email: 'user@gmail.com',
+      provider: 'google',
+      avatar: 'https://ui-avatars.com/api/?name=Google+User&background=4285F4&color=fff'
+    };
+    localStorage.setItem('todo_user', JSON.stringify(user));
+    router.push('/');
+  };
+
+  const handleEmailRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    const user = {
+      id: 'u-67890',
+      name: 'Demo User',
+      email: 'demo@example.com',
+      provider: 'email',
+      avatar: 'https://ui-avatars.com/api/?name=Demo+User&background=FFD700&color=121212'
+    };
+    localStorage.setItem('todo_user', JSON.stringify(user));
+    router.push('/');
+  };
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -30,7 +58,7 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleEmailRegister}>
             <div className="space-y-2">
               <input 
                 type="text" 
@@ -80,7 +108,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-3 py-3.5 bg-[#F8F9FA] hover:bg-[#E9ECEF] border border-[#E9ECEF] rounded-xl text-sm font-bold text-[#121212] transition-all active:scale-[0.98]">
+            <button type="button" onClick={handleGoogleLogin} className="flex items-center justify-center gap-3 py-3.5 bg-[#F8F9FA] hover:bg-[#E9ECEF] border border-[#E9ECEF] rounded-xl text-sm font-bold text-[#121212] transition-all active:scale-[0.98]">
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
