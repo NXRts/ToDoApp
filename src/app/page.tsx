@@ -20,7 +20,11 @@ export default function Home() {
     addTask, toggleTaskCompletion, updateTask, deleteTask, 
     addList, updateList, deleteList, 
     addTag, updateTag, deleteTag,
-    addHabit, updateHabit, deleteHabit, toggleHabitLog
+    addHabit, updateHabit, deleteHabit, toggleHabitLog,
+    notes,
+    addNote,
+    updateNote,
+    deleteNote,
   } = useTasks();
   
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
@@ -126,17 +130,16 @@ export default function Home() {
   return (
     <div className="flex w-full h-screen bg-background overflow-hidden">
       <Sidebar 
-        lists={lists} 
-        tasks={tasks}
-        tags={tags} 
         currentView={currentView} 
-        onViewChange={setCurrentView}
+        onNavigate={(view) => { setCurrentView(view); setSelectedListId(null); }} 
+        lists={lists} 
+        tags={tags}
         selectedListId={selectedListId}
-        onListSelect={setSelectedListId}
-        onAddList={addList}
+        onSelectList={setSelectedListId}
+        onAddList={() => addList('New List', 'bg-blue-500')}
         onUpdateList={updateList}
         onDeleteList={deleteList}
-        onAddTag={addTag}
+        onAddTag={() => addTag('New Tag', 'bg-slate-500')}
         onUpdateTag={updateTag}
         onDeleteTag={deleteTag}
       />
@@ -148,6 +151,7 @@ export default function Home() {
           <div className="flex items-center justify-center min-w-8 h-8 px-2 rounded-lg border border-border text-foreground font-bold text-xl">
             {currentView === 'dashboard' ? (tasks.filter(t => !t.isCompleted).length) : 
              currentView === 'habits' ? habits.length : 
+             currentView === 'sticky-wall' ? notes.length :
              filteredTasks.length}
           </div>
         </header>
@@ -182,13 +186,10 @@ export default function Home() {
             />
           ) : currentView === 'sticky-wall' ? (
             <StickyWall 
-              tasks={tasks} 
-              lists={lists} 
-              onTaskClick={setSelectedTaskId} 
-              onAddTask={() => {
-                const id = addTask('New Note', selectedListId || '');
-                setSelectedTaskId(id);
-              }} 
+              notes={notes}
+              onAddNote={() => addNote()}
+              onUpdateNote={updateNote}
+              onDeleteNote={deleteNote}
             />
           ) : currentView === 'settings' ? (
             <SettingsView />
