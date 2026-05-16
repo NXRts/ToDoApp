@@ -131,11 +131,12 @@ export default function Home() {
     <div className="flex w-full h-screen bg-background overflow-hidden">
       <Sidebar 
         currentView={currentView} 
-        onNavigate={(view) => { setCurrentView(view); setSelectedListId(null); }} 
+        onViewChange={(view) => { setCurrentView(view); setSelectedListId(null); }} 
         lists={lists} 
+        tasks={tasks}
         tags={tags}
         selectedListId={selectedListId}
-        onSelectList={setSelectedListId}
+        onListSelect={setSelectedListId}
         onAddList={() => addList('New List', 'bg-blue-500')}
         onUpdateList={updateList}
         onDeleteList={deleteList}
