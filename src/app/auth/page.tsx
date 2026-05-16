@@ -7,15 +7,15 @@ import { motion } from 'framer-motion';
 export default function AuthPage() {
   return (
     <div className="flex min-h-screen bg-[#F8F9FA]">
-      <AuthSidebar />
+      <AuthSidebar imageSrc="/assets/welcome.png" />
       
       {/* Right Panel - Welcome */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-24 bg-white">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-24 bg-white relative">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="max-w-md w-full text-center space-y-8"
+          className="max-w-md w-full text-center space-y-8 relative z-10"
         >
           <div className="space-y-4">
             <h2 className="text-5xl font-black text-[#121212] tracking-tight">
