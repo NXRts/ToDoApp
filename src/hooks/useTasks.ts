@@ -1,5 +1,5 @@
 import { useLocalStorage } from './useLocalStorage';
-import { Task, Priority, TodoList, Tag, Habit } from '@/types/todo';
+import { Task, Priority, TodoList, Tag, Habit, Note } from '@/types/todo';
 import { v4 as uuidv4 } from 'uuid';
 
 export function useTasks() {
@@ -141,6 +141,32 @@ export function useTasks() {
     }));
   };
 
+  // --- Notes Management (Sticky Wall) ---
+  const [notes, setNotes] = useLocalStorage<Note[]>('todo_notes', [
+    { id: 'n1', title: 'Idea: App features', content: '- Habit tracker\n- Productivity dashboard\n- Analytics', color: 'bg-yellow-400', createdAt: new Date().toISOString() },
+    { id: 'n2', title: 'Groceries', content: 'Milk\nBread\nEggs', color: 'bg-green-400', createdAt: new Date().toISOString() }
+  ]);
+
+  const addNote = (color: string = 'bg-yellow-400') => {
+    const newNote: Note = {
+      id: uuidv4(),
+      title: '',
+      content: '',
+      color,
+      createdAt: new Date().toISOString(),
+    };
+    setNotes((prev) => [...prev, newNote]);
+    return newNote.id;
+  };
+
+  const updateNote = (id: string, updates: Partial<Note>) => {
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, ...updates } : n)));
+  };
+
+  const deleteNote = (id: string) => {
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+  };
+
   return {
     tasks,
     lists,
@@ -160,5 +186,9 @@ export function useTasks() {
     updateHabit,
     deleteHabit,
     toggleHabitLog,
+    notes,
+    addNote,
+    updateNote,
+    deleteNote,
   };
 }
