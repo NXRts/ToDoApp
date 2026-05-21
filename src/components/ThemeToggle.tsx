@@ -5,18 +5,19 @@ import { Moon, Sun } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    // Check initial preference
-    if (
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return (
       localStorage.theme === 'dark' ||
       (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
-      setIsDark(true);
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
+    );
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    document.documentElement.classList.toggle('dark', isDark);
+    localStorage.theme = isDark ? 'dark' : 'light';
+  }, [isDark]);
 
   const toggleTheme = () => {
     if (isDark) {

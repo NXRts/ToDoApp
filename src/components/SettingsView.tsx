@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User, Moon, Sun, Monitor, Bell, Shield, Database, Info, LogOut, ChevronRight, Trash2, Download, Upload } from 'lucide-react';
+import { User, Moon, Sun, Monitor, Bell, Shield, Database, Info, Trash2, Download, Upload } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
 export function SettingsView() {
@@ -13,9 +13,11 @@ export function SettingsView() {
     return JSON.parse(localStorage.getItem('todo_profile') || '{"name": "NXRts", "email": ""}');
   });
 
+  type ThemeOption = 'light' | 'dark' | 'system';
+
   const [appearance, setAppearance] = useState(() => {
-    if (typeof window === 'undefined') return { theme: 'light', glassmorphism: true, compact: false };
-    return JSON.parse(localStorage.getItem('todo_appearance') || '{"theme": "light", "glassmorphism": true, "compact": false}');
+    if (typeof window === 'undefined') return { theme: 'light' as ThemeOption, glassmorphism: true, compact: false };
+    return JSON.parse(localStorage.getItem('todo_appearance') || '{"theme": "light", "glassmorphism": true, "compact": false}') as { theme: ThemeOption; glassmorphism: boolean; compact: boolean };
   });
 
   const [notifications, setNotifications] = useState(() => {
@@ -97,7 +99,7 @@ export function SettingsView() {
         if (data.notifications) setNotifications(data.notifications);
         alert('Data imported successfully! The page will reload.');
         window.location.reload();
-      } catch (err) {
+      } catch {
         alert('Invalid backup file.');
       }
     };
@@ -184,14 +186,14 @@ export function SettingsView() {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              {[
+              {([
                 { id: 'light', label: 'Light', icon: Sun },
                 { id: 'dark', label: 'Dark', icon: Moon },
                 { id: 'system', label: 'System', icon: Monitor },
-              ].map((theme) => (
+              ] as const).map((theme) => (
                 <button
                   key={theme.id}
-                  onClick={() => setAppearance({ ...appearance, theme: theme.id as any })}
+                  onClick={() => setAppearance({ ...appearance, theme: theme.id })}
                   className={twMerge(
                     "flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all",
                     appearance.theme === theme.id 
@@ -287,7 +289,7 @@ export function SettingsView() {
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div>
               <h3 className="text-xl font-bold mb-1">Data Management</h3>
-              <p className="text-sm text-muted-foreground">Control your data and how it's handled.</p>
+              <p className="text-sm text-muted-foreground">Control your data and how it&apos;s handled.</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
