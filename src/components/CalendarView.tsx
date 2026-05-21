@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { Task, TodoList } from '@/types/todo';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, parseISO, addDays, subDays, isSameDay } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
 
@@ -57,7 +57,6 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
   // Month calculations
   const monthDays = useMemo(() => {
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
     
     // Find the Monday of the first week
     const startDay = startOfMonth.getDay();
@@ -96,7 +95,6 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
 
   const currentTimePosition = useMemo(() => {
     if (viewMode === 'Month') return -1;
-    const today = new Date();
     if (viewMode === 'Day') {
       if (!isSameDay(currentTime, currentDate)) return -1;
     } else {

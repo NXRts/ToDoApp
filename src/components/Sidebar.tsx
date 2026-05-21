@@ -1,4 +1,4 @@
-import { Search, Menu, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut, Edit2, Trash2, X, LayoutDashboard, Activity } from 'lucide-react';
+import { Search, Menu, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut, Edit2, Trash2, LayoutDashboard, Activity } from 'lucide-react';
 import { TodoList, Tag, ViewMode, Task } from '@/types/todo';
 import { twMerge } from 'tailwind-merge';
 import { useState } from 'react';

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface AuthSidebarProps {
   imageSrc?: string;
@@ -18,11 +18,15 @@ export function AuthSidebar({ imageSrc = '/assets/Login.png' }: AuthSidebarProps
 
       {/* Auth Illustration */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-12 z-0">
-        <img 
-          src={imageSrc}
-          alt="To-Do Mind Illustration"
-          className="w-full h-auto object-contain max-w-[450px] drop-shadow-2xl"
-        />
+        <div className="relative w-full h-full max-w-[450px]">
+          <Image
+            src={imageSrc}
+            alt="To-Do Mind Illustration"
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
       </div>
 
       {/* Subtle Gradient Overlay */}

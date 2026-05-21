@@ -131,7 +131,7 @@ export function useTasks() {
     setHabits((prev) => prev.map((h) => {
       if (h.id !== habitId) return h;
       const existingLogIndex = h.logs.findIndex(l => l.date === date);
-      let newLogs = [...h.logs];
+      const newLogs = [...h.logs];
       if (existingLogIndex >= 0) {
         newLogs.splice(existingLogIndex, 1);
       } else {

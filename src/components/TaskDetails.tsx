@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Task, TodoList, Tag, Subtask } from '@/types/todo';
-import { X, Plus, Trash2, ChevronDown, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { X, Plus, Trash2, ChevronDown, Clock } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -25,18 +25,6 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [showTagPicker, setShowTagPicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-
-  useEffect(() => {
-    setTitle(task.title);
-    setDescription(task.description || '');
-    setListId(task.category);
-    setDueDate(task.deadline ? task.deadline.substring(0, 10) : '');
-    setSelectedTags(task.tags || []);
-    setSubtasks(task.subtasks || []);
-    setStartTime(task.startTime || '');
-    setDuration(task.duration || 60);
-    setNewSubtaskTitle('');
-  }, [task]);
 
   const handleSave = () => {
     onSave(task.id, {

@@ -1,9 +1,11 @@
 'use client';
 
 import { Task, Habit, TodoList } from '@/types/todo';
-import { CheckCircle2, TrendingUp, Clock, Zap, Target, Flame, Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
+import { CheckCircle2, TrendingUp, Zap, Target, Flame, ChevronRight } from 'lucide-react';
 import { format, isToday, parseISO, subDays, isSameDay } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
+
+import { ViewMode } from '@/types/todo';
 
 interface DashboardViewProps {
   tasks: Task[];
@@ -11,7 +13,7 @@ interface DashboardViewProps {
   lists: TodoList[];
   onTaskToggle: (id: string) => void;
   onHabitToggle: (id: string, date: string) => void;
-  onNavigate: (view: any) => void;
+  onNavigate: (view: ViewMode) => void;
 }
 
 export function DashboardView({ tasks, habits, lists, onTaskToggle, onHabitToggle, onNavigate }: DashboardViewProps) {
@@ -252,7 +254,7 @@ export function DashboardView({ tasks, habits, lists, onTaskToggle, onHabitToggl
             ))}
             {todayTasks.length === 0 && (
               <div className="m-auto text-center py-6">
-                <p className="text-sm font-medium text-muted-foreground italic">No tasks for today. You're free!</p>
+                <p className="text-sm font-medium text-muted-foreground italic">No tasks for today. You&apos;re free!</p>
               </div>
             )}
           </div>

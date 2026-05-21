@@ -17,5 +17,5 @@
     if (appearance.compact) {
       document.documentElement.classList.add('compact-mode');
     }
-  } catch (e) {}
+  } catch {}
 })();

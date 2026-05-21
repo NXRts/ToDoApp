@@ -12,7 +12,7 @@ import { SettingsView } from '@/components/SettingsView';
 import { DashboardView } from '@/components/DashboardView';
 import { HabitTrackerView } from '@/components/HabitTrackerView';
 import { ViewMode } from '@/types/todo';
-import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns';
+import { isToday, isTomorrow, parseISO } from 'date-fns';
 
 export default function Home() {
   const { 

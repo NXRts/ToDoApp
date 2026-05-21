@@ -1,31 +1,27 @@
 import { useState, useEffect, useRef } from 'react';
 
+function getStoredValue<T>(key: string, initialValue: T): T {
+  if (typeof window === 'undefined') return initialValue;
+
+  try {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse(item) : initialValue;
+  } catch (error) {
+    console.warn(`Error reading localStorage key "${key}":`, error);
+    return initialValue;
+  }
+}
+
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  // Use a ref to prevent unnecessary effect triggers
   const isFirstRender = useRef(true);
+  const [storedValue, setStoredValue] = useState<T>(() => getStoredValue(key, initialValue));
 
-  // Initialize state with initialValue, then load from storage in useEffect
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    try {
-      const item = window.localStorage.getItem(key);
-      if (item) {
-        setStoredValue(JSON.parse(item));
-      }
-    } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
-    }
-  }, [key]);
-
-  // Persist to localStorage whenever storedValue changes
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
-    
+
     try {
       window.localStorage.setItem(key, JSON.stringify(storedValue));
     } catch (error) {
