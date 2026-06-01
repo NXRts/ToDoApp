@@ -77,6 +77,33 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [formData, setFormData] = useState({ name: '', color: PRESET_COLORS[0], icon: PRESET_ICONS[0] });
   const [activeTemplateCategory, setActiveTemplateCategory] = useState<string>('Semua');
+  const [isDragStart, setIsDragStart] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragScrollLeft, setDragScrollLeft] = useState(0);
+
+  const handleHorizontalScroll = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (e.deltaY !== 0) {
+      e.currentTarget.scrollLeft += e.deltaY;
+    }
+  };
+
+  const onDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragStart(true);
+    setDragStartX(e.pageX - e.currentTarget.offsetLeft);
+    setDragScrollLeft(e.currentTarget.scrollLeft);
+  };
+
+  const onDragEnd = () => {
+    setIsDragStart(false);
+  };
+
+  const onDragMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragStart) return;
+    e.preventDefault();
+    const x = e.pageX - e.currentTarget.offsetLeft;
+    const walk = (x - dragStartX) * 1.5;
+    e.currentTarget.scrollLeft = dragScrollLeft - walk;
+  };
 
   const openModal = (habit?: Habit) => {
     if (habit) {
@@ -337,39 +364,104 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
                   </div>
                   
                   {/* Category Tags */}
-                  <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                    {TEMPLATE_CATEGORIES.map(category => (
-                      <button
-                        key={category}
-                        type="button"
-                        onClick={() => setActiveTemplateCategory(category)}
-                        className={twMerge(
-                          "px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all shrink-0 border cursor-pointer",
-                          activeTemplateCategory === category
-                            ? "bg-emerald-500 border-emerald-500 text-white shadow-sm"
-                            : "bg-background border-border/50 text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        {category}
-                      </button>
-                    ))}
+                  <div className="relative w-full group/cat">
+                    {/* Left Scroll Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const container = e.currentTarget.nextElementSibling;
+                        if (container) container.scrollBy({ left: -100, behavior: 'smooth' });
+                      }}
+                      className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm border border-border shadow-sm rounded-full p-1 text-foreground/75 hover:text-foreground transition-all cursor-pointer opacity-0 group-hover/cat:opacity-100 hidden md:flex items-center justify-center w-6 h-6"
+                    >
+                      <ChevronLeft size={12} strokeWidth={3} />
+                    </button>
+                    
+                    <div 
+                      className="flex flex-row flex-nowrap gap-1.5 overflow-x-auto pb-1 scrollbar-none w-full max-w-full select-none"
+                      onWheel={handleHorizontalScroll}
+                    >
+                      {TEMPLATE_CATEGORIES.map(category => (
+                        <button
+                          key={category}
+                          type="button"
+                          onClick={() => setActiveTemplateCategory(category)}
+                          className={twMerge(
+                            "px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all shrink-0 border cursor-pointer",
+                            activeTemplateCategory === category
+                              ? "bg-emerald-500 border-emerald-500 text-white shadow-sm"
+                              : "bg-background border-border/50 text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          {category}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Right Scroll Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const container = e.currentTarget.previousElementSibling;
+                        if (container) container.scrollBy({ left: 100, behavior: 'smooth' });
+                      }}
+                      className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm border border-border shadow-sm rounded-full p-1 text-foreground/75 hover:text-foreground transition-all cursor-pointer opacity-0 group-hover/cat:opacity-100 hidden md:flex items-center justify-center w-6 h-6"
+                    >
+                      <ChevronRight size={12} strokeWidth={3} />
+                    </button>
                   </div>
 
                   {/* Templates Grid/List */}
-                  <div className="flex gap-2 overflow-x-auto pb-1 pt-1.5 custom-scrollbar min-h-[44px]">
-                    {HABIT_TEMPLATES.filter(t => activeTemplateCategory === 'Semua' || t.category === activeTemplateCategory).map(template => (
-                      <button
-                        key={template.name}
-                        type="button"
-                        onClick={() => setFormData({ name: template.name, color: template.color, icon: template.icon })}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-muted/50 border border-border/50 hover:border-foreground/20 rounded-xl text-xs font-bold transition-all shrink-0 active:scale-95 text-foreground shadow-sm group/btn cursor-pointer"
-                      >
-                        <span className={twMerge("w-6 h-6 flex items-center justify-center rounded-lg text-sm shrink-0", template.color)}>
-                          {template.icon}
-                        </span>
-                        <span className="truncate max-w-[120px]">{template.name}</span>
-                      </button>
-                    ))}
+                  <div className="relative w-full group/temp">
+                    {/* Left Scroll Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const container = e.currentTarget.nextElementSibling;
+                        if (container) container.scrollBy({ left: -150, behavior: 'smooth' });
+                      }}
+                      className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm border border-border shadow-sm rounded-full p-1 text-foreground/75 hover:text-foreground transition-all cursor-pointer opacity-0 group-hover/temp:opacity-100 hidden md:flex items-center justify-center w-6 h-6"
+                    >
+                      <ChevronLeft size={14} strokeWidth={3} />
+                    </button>
+
+                    <div 
+                      className={twMerge(
+                        "flex flex-row flex-nowrap gap-2 overflow-x-auto pb-1 pt-1.5 scrollbar-none min-h-[44px] w-full max-w-full select-none",
+                        isDragStart ? "cursor-grabbing" : "cursor-grab"
+                      )}
+                      onWheel={handleHorizontalScroll}
+                      onMouseDown={onDragStart}
+                      onMouseUp={onDragEnd}
+                      onMouseLeave={onDragEnd}
+                      onMouseMove={onDragMove}
+                    >
+                      {HABIT_TEMPLATES.filter(t => activeTemplateCategory === 'Semua' || t.category === activeTemplateCategory).map(template => (
+                        <button
+                          key={template.name}
+                          type="button"
+                          onClick={() => setFormData({ name: template.name, color: template.color, icon: template.icon })}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-muted/50 border border-border/50 hover:border-foreground/20 rounded-xl text-xs font-bold transition-all shrink-0 active:scale-95 text-foreground shadow-sm group/btn cursor-pointer"
+                        >
+                          <span className={twMerge("w-6 h-6 flex items-center justify-center rounded-lg text-sm shrink-0", template.color)}>
+                            {template.icon}
+                          </span>
+                          <span className="truncate max-w-[120px]">{template.name}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Right Scroll Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        const container = e.currentTarget.previousElementSibling;
+                        if (container) container.scrollBy({ left: 150, behavior: 'smooth' });
+                      }}
+                      className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm border border-border shadow-sm rounded-full p-1 text-foreground/75 hover:text-foreground transition-all cursor-pointer opacity-0 group-hover/temp:opacity-100 hidden md:flex items-center justify-center w-6 h-6"
+                    >
+                      <ChevronRight size={14} strokeWidth={3} />
+                    </button>
                   </div>
                 </div>
               )}
