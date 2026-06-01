@@ -480,7 +480,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Icon</label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 p-1">
                   {PRESET_ICONS.map(icon => (
                     <button 
                       key={icon}
@@ -495,7 +495,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Color</label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 p-1">
                   {PRESET_COLORS.map(color => (
                     <button 
                       key={color}
