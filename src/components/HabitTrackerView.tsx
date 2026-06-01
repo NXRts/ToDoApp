@@ -16,8 +16,57 @@ interface HabitTrackerViewProps {
 
 type TrackerViewMode = 'daily' | 'weekly' | 'monthly';
 
-const PRESET_COLORS = ['bg-indigo-500', 'bg-emerald-500', 'bg-orange-500', 'bg-blue-500', 'bg-pink-500', 'bg-purple-500'];
-const PRESET_ICONS = ['🧘', '📚', '🏃', '💧', '🥗', '💻', '🎨', '✨'];
+const PRESET_COLORS = [
+  'bg-indigo-500', 
+  'bg-emerald-500', 
+  'bg-orange-500', 
+  'bg-blue-500', 
+  'bg-pink-500', 
+  'bg-purple-500', 
+  'bg-red-500', 
+  'bg-yellow-500'
+];
+
+const PRESET_ICONS = [
+  '🧘', '📚', '🏃', '💧', '🥗', '💻', '🎨', '✨', 
+  '🏋️', '😴', '✍️', '🗣️', '🎯', '📧', '🧹', '⌛', '🎸', '🌱'
+];
+
+interface HabitTemplate {
+  name: string;
+  icon: string;
+  color: string;
+  category: string;
+}
+
+const HABIT_TEMPLATES: HabitTemplate[] = [
+  // Kesehatan & Kebugaran
+  { name: 'Minum Air (2L)', icon: '💧', color: 'bg-blue-500', category: 'Kesehatan' },
+  { name: 'Meditasi Pagi', icon: '🧘', color: 'bg-indigo-500', category: 'Kesehatan' },
+  { name: 'Olahraga Harian', icon: '🏋️', color: 'bg-emerald-500', category: 'Kesehatan' },
+  { name: 'Lari Pagi', icon: '🏃', color: 'bg-emerald-500', category: 'Kesehatan' },
+  { name: 'Makan Sehat', icon: '🥗', color: 'bg-emerald-500', category: 'Kesehatan' },
+  { name: 'Tidur Cepat (22:00)', icon: '😴', color: 'bg-indigo-500', category: 'Kesehatan' },
+  
+  // Belajar & Pengembangan Diri
+  { name: 'Membaca Buku', icon: '📚', color: 'bg-orange-500', category: 'Belajar' },
+  { name: 'Belajar Koding', icon: '💻', color: 'bg-blue-500', category: 'Belajar' },
+  { name: 'Menulis Jurnal', icon: '✍️', color: 'bg-purple-500', category: 'Belajar' },
+  { name: 'Belajar Bahasa', icon: '🗣️', color: 'bg-orange-500', category: 'Belajar' },
+  
+  // Produktivitas
+  { name: 'Tulis Goals Harian', icon: '🎯', color: 'bg-pink-500', category: 'Produktivitas' },
+  { name: 'Sesi Pomodoro', icon: '⌛', color: 'bg-pink-500', category: 'Produktivitas' },
+  { name: 'Rapikan Meja Kerja', icon: '🧹', color: 'bg-orange-500', category: 'Produktivitas' },
+  { name: 'Bersihkan Email', icon: '📧', color: 'bg-blue-500', category: 'Produktivitas' },
+  
+  // Kreativitas & Hobi
+  { name: 'Menggambar / Melukis', icon: '🎨', color: 'bg-purple-500', category: 'Hobi' },
+  { name: 'Latihan Musik', icon: '🎸', color: 'bg-pink-500', category: 'Hobi' },
+  { name: 'Menyiram Tanaman', icon: '🌱', color: 'bg-emerald-500', category: 'Hobi' },
+];
+
+const TEMPLATE_CATEGORIES = ['Semua', 'Kesehatan', 'Belajar', 'Produktivitas', 'Hobi'];
 
 export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHabit, onDeleteHabit }: HabitTrackerViewProps) {
   const [viewMode, setViewMode] = useState<TrackerViewMode>('monthly');
@@ -27,6 +76,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [formData, setFormData] = useState({ name: '', color: PRESET_COLORS[0], icon: PRESET_ICONS[0] });
+  const [activeTemplateCategory, setActiveTemplateCategory] = useState<string>('Semua');
 
   const openModal = (habit?: Habit) => {
     if (habit) {
@@ -35,6 +85,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
     } else {
       setEditingHabit(null);
       setFormData({ name: '', color: PRESET_COLORS[0], icon: PRESET_ICONS[0] });
+      setActiveTemplateCategory('Semua');
     }
     setIsModalOpen(true);
   };
@@ -275,7 +326,54 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
               </button>
             </div>
             
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 overflow-y-auto max-h-[70vh] pr-1 custom-scrollbar">
+              {/* Quick Templates Section - Only show when creating a new habit */}
+              {!editingHabit && (
+                <div className="flex flex-col gap-2 bg-muted/20 border border-border/40 p-4 rounded-2xl mb-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                      <span>💡</span> Pilih dari Template Produktif
+                    </label>
+                  </div>
+                  
+                  {/* Category Tags */}
+                  <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                    {TEMPLATE_CATEGORIES.map(category => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => setActiveTemplateCategory(category)}
+                        className={twMerge(
+                          "px-2.5 py-1 rounded-lg text-[10px] font-extrabold transition-all shrink-0 border cursor-pointer",
+                          activeTemplateCategory === category
+                            ? "bg-emerald-500 border-emerald-500 text-white shadow-sm"
+                            : "bg-background border-border/50 text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Templates Grid/List */}
+                  <div className="flex gap-2 overflow-x-auto pb-1 pt-1.5 custom-scrollbar min-h-[44px]">
+                    {HABIT_TEMPLATES.filter(t => activeTemplateCategory === 'Semua' || t.category === activeTemplateCategory).map(template => (
+                      <button
+                        key={template.name}
+                        type="button"
+                        onClick={() => setFormData({ name: template.name, color: template.color, icon: template.icon })}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-muted/50 border border-border/50 hover:border-foreground/20 rounded-xl text-xs font-bold transition-all shrink-0 active:scale-95 text-foreground shadow-sm group/btn cursor-pointer"
+                      >
+                        <span className={twMerge("w-6 h-6 flex items-center justify-center rounded-lg text-sm shrink-0", template.color)}>
+                          {template.icon}
+                        </span>
+                        <span className="truncate max-w-[120px]">{template.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Habit Name</label>
                 <input 
