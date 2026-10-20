@@ -73,37 +73,37 @@ export function DashboardView({ tasks, habits, lists, onTaskToggle, onHabitToggl
       </div>
 
       {/* Top Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Tasks Completed */}
-        <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-card border border-border/50 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center">
               <CheckCircle2 size={18} />
             </div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Today</span>
           </div>
           <div>
-            <h3 className="text-3xl font-black text-foreground">{completedTasks.length}</h3>
-            <p className="text-xs text-muted-foreground font-medium mt-1">Tasks Completed</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-foreground">{completedTasks.length}</h3>
+            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium mt-1">Tasks Completed</p>
           </div>
         </div>
 
         {/* Habits Active */}
-        <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-card border border-border/50 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
               <Flame size={18} />
             </div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Today</span>
           </div>
           <div>
-            <h3 className="text-3xl font-black text-foreground">{completedHabits.length}</h3>
-            <p className="text-xs text-muted-foreground font-medium mt-1">Habits Done</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-foreground">{completedHabits.length}</h3>
+            <p className="text-[11px] sm:text-xs text-muted-foreground font-medium mt-1">Habits Done</p>
           </div>
         </div>
 
         {/* Overall Progress */}
-        <div className="md:col-span-2 bg-card border border-border/50 rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-center">
+        <div className="col-span-2 md:col-span-2 bg-card border border-border/50 rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden flex flex-col justify-center">
           <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
           <div className="absolute right-0 bottom-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -mr-5 -mb-5"></div>
           
@@ -139,12 +139,12 @@ export function DashboardView({ tasks, habits, lists, onTaskToggle, onHabitToggl
             </div>
           </div>
 
-          <div className="flex-1 flex items-end justify-between gap-2 h-[200px] mt-auto">
+          <div className="flex-1 flex items-end justify-between gap-2 h-50 mt-auto">
             {weeklyData.map((data, index) => {
               const heightPercentage = (data.count / maxWeeklyCount) * 100;
               return (
                 <div key={index} className="flex flex-col items-center gap-3 w-full group">
-                  <div className="relative w-full flex justify-center h-[150px] items-end">
+                  <div className="relative w-full flex justify-center h-37.5 items-end">
                     {/* Tooltip */}
                     <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-foreground text-background text-[10px] font-bold py-1 px-2 rounded-md pointer-events-none z-10 whitespace-nowrap">
                       {data.count} tasks
@@ -152,7 +152,7 @@ export function DashboardView({ tasks, habits, lists, onTaskToggle, onHabitToggl
                     {/* Bar */}
                     <div 
                       className={twMerge(
-                        "w-full max-w-[40px] rounded-t-xl transition-all duration-500 relative overflow-hidden",
+                        "w-full max-w-10 rounded-t-xl transition-all duration-500 relative overflow-hidden",
                         isSameDay(data.date, today) ? "bg-indigo-500" : "bg-muted-foreground/20 group-hover:bg-indigo-500/50"
                       )}
                       style={{ height: `${Math.max(heightPercentage, 5)}%` }}

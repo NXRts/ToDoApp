@@ -71,14 +71,29 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
   };
 
   return (
-    <aside className="w-[350px] h-screen bg-sidebar flex flex-col border-l border-border/50 shrink-0 py-8 px-6 overflow-y-auto custom-scrollbar animate-in slide-in-from-right duration-300">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">Task:</h2>
-        <button onClick={onClose} className="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground">
-          <X size={24} />
-        </button>
-      </div>
+    <>
+      {/* Mobile Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 md:hidden animate-in fade-in duration-200"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <aside className="fixed md:static inset-x-0 bottom-0 z-50 md:z-auto w-full md:w-87.5 max-h-[88vh] md:max-h-none h-auto md:h-screen bg-sidebar flex flex-col border-t md:border-t-0 md:border-l border-border/60 shrink-0 p-6 md:py-8 md:px-6 overflow-y-auto custom-scrollbar rounded-t-3xl md:rounded-none shadow-2xl md:shadow-none animate-in slide-in-from-bottom md:slide-in-from-right duration-300 pb-[max(env(safe-area-inset-bottom),1.5rem)] md:pb-8">
+        {/* Mobile Drag Indicator */}
+        <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full mx-auto mb-4 md:hidden shrink-0" />
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">Task Details</h2>
+          <button 
+            onClick={onClose} 
+            className="p-1.5 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+            aria-label="Close details"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
       <div className="flex flex-col gap-6">
         {/* Title Input */}
@@ -95,7 +110,7 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description"
-          className="w-full bg-muted/20 border border-border/40 rounded-xl py-4 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/20 transition-all min-h-[120px] resize-none custom-scrollbar text-foreground placeholder:text-muted-foreground/30"
+          className="w-full bg-muted/20 border border-border/40 rounded-xl py-4 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/20 transition-all min-h-30 resize-none custom-scrollbar text-foreground placeholder:text-muted-foreground/30"
         />
 
         {/* Properties Grid */}
@@ -346,5 +361,6 @@ export function TaskDetails({ task, lists, tags, onSave, onDelete, onClose }: Ta
         </button>
       </div>
     </aside>
+  </>
   );
 }

@@ -1,4 +1,4 @@
-import { Search, Menu, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut, Edit2, Trash2, LayoutDashboard, Activity } from 'lucide-react';
+import { Search, X, ChevronsRight, ListTodo, Calendar as CalendarIcon, StickyNote, Plus, Settings, LogOut, Edit2, Trash2, LayoutDashboard, Activity } from 'lucide-react';
 import { TodoList, Tag, ViewMode, Task } from '@/types/todo';
 import { twMerge } from 'tailwind-merge';
 import { useState } from 'react';
@@ -17,9 +17,11 @@ interface SidebarProps {
   onAddTag: (name: string, color: string) => void;
   onUpdateTag: (id: string, name: string, color: string) => void;
   onDeleteTag: (id: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selectedListId, onListSelect, onAddList, onUpdateList, onDeleteList, onAddTag, onUpdateTag, onDeleteTag }: SidebarProps) {
+export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selectedListId, onListSelect, onAddList, onUpdateList, onDeleteList, onAddTag, onUpdateTag, onDeleteTag, isOpen = false, onClose }: SidebarProps) {
   const [isAddingList, setIsAddingList] = useState(false);
   const [editingListId, setEditingListId] = useState<string | null>(null);
   const [isAddingTag, setIsAddingTag] = useState(false);
@@ -104,60 +106,83 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
     }
   };
 
+  const handleNavigate = (view: ViewMode, listId: string | null = null) => {
+    onViewChange(view);
+    onListSelect(listId);
+    onClose?.();
+  };
+
   return (
-    <aside className="w-64 h-screen bg-sidebar flex flex-col border-r border-border shrink-0 py-6 px-4 overflow-y-auto custom-scrollbar">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 px-2">
-        <h1 className="text-xl font-bold tracking-tight">ToDoApp</h1>
-        <button className="text-muted-foreground hover:text-foreground">
-          <Menu size={20} />
-        </button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="relative mb-8">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-        <input
-          type="text"
-          placeholder="Search"
-          className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-sm focus:outline-none focus:border-foreground transition-colors"
+    <>
+      {/* Mobile Drawer Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 md:hidden animate-in fade-in duration-200"
+          onClick={onClose}
+          aria-hidden="true"
         />
-      </div>
+      )}
 
-      {/* OVERVIEW Section */}
-      <div className="mb-8">
-        <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-2">Overview</h2>
-        <ul className="space-y-1">
-          <li>
-            <button
-              onClick={() => { onViewChange('dashboard'); onListSelect(null); }}
-              className={twMerge(
-                "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
-                currentView === 'dashboard' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <LayoutDashboard size={16} />
-                <span>Dashboard</span>
-              </div>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => { onViewChange('habits'); onListSelect(null); }}
-              className={twMerge(
-                "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
-                currentView === 'habits' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <Activity size={16} />
-                <span>Habit Tracker</span>
-              </div>
-            </button>
-          </li>
-        </ul>
-      </div>
+      <aside className={twMerge(
+        "fixed md:static inset-y-0 left-0 z-50 w-72 md:w-64 h-screen bg-sidebar flex flex-col border-r border-border shrink-0 py-6 px-4 overflow-y-auto custom-scrollbar transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none",
+        isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      )}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 px-2">
+          <h1 className="text-xl font-bold tracking-tight">ToDoApp</h1>
+          <button 
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground md:hidden p-1.5 hover:bg-muted rounded-lg transition-colors"
+            aria-label="Close menu"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative mb-8">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-full bg-background border border-border rounded-lg py-2 pl-9 pr-3 text-sm focus:outline-none focus:border-foreground transition-colors"
+          />
+        </div>
+
+        {/* OVERVIEW Section */}
+        <div className="mb-8">
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-2">Overview</h2>
+          <ul className="space-y-1">
+            <li>
+              <button
+                onClick={() => handleNavigate('dashboard', null)}
+                className={twMerge(
+                  "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
+                  currentView === 'dashboard' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <LayoutDashboard size={16} />
+                  <span>Dashboard</span>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleNavigate('habits', null)}
+                className={twMerge(
+                  "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
+                  currentView === 'habits' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <Activity size={16} />
+                  <span>Habit Tracker</span>
+                </div>
+              </button>
+            </li>
+          </ul>
+        </div>
 
       {/* TASKS Section */}
       <div className="mb-8 border-t border-border pt-6">
@@ -165,7 +190,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
         <ul className="space-y-1">
           <li>
             <button
-              onClick={() => { onViewChange('upcoming'); onListSelect(null); }}
+              onClick={() => handleNavigate('upcoming', null)}
               className={twMerge(
                 "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
                 currentView === 'upcoming' && !selectedListId ? "bg-border font-medium" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
@@ -179,7 +204,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
           </li>
           <li>
             <button
-              onClick={() => { onViewChange('today'); onListSelect(null); }}
+              onClick={() => handleNavigate('today', null)}
               className={twMerge(
                 "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
                 currentView === 'today' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
@@ -193,7 +218,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
           </li>
           <li>
             <button
-              onClick={() => { onViewChange('calendar'); onListSelect(null); }}
+              onClick={() => handleNavigate('calendar', null)}
               className={twMerge(
                 "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
                 currentView === 'calendar' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
@@ -207,7 +232,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
           </li>
           <li>
             <button
-              onClick={() => { onViewChange('sticky-wall'); onListSelect(null); }}
+              onClick={() => handleNavigate('sticky-wall', null)}
               className={twMerge(
                 "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors",
                 currentView === 'sticky-wall' && !selectedListId ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
@@ -281,7 +306,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
             return (
               <li key={list.id} className="group relative">
                 <div
-                  onClick={() => { onListSelect(list.id); onViewChange('list'); }}
+                  onClick={() => handleNavigate('list', list.id)}
                   className={twMerge(
                     "w-full flex items-center justify-between px-2 py-2 rounded-lg text-sm transition-colors cursor-pointer",
                     selectedListId === list.id ? "bg-border font-medium text-foreground" : "hover:bg-border/50 text-muted-foreground hover:text-foreground"
@@ -497,7 +522,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
       {/* Bottom Actions */}
       <div className="mt-8 pt-6 border-t border-border">
         <button 
-          onClick={() => { onViewChange('settings'); onListSelect(null); }}
+          onClick={() => handleNavigate('settings', null)}
           className={twMerge(
             "w-full flex items-center gap-3 px-2 py-2 rounded-lg text-sm transition-colors",
             currentView === 'settings' ? "bg-border font-medium text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-border/50"
@@ -512,5 +537,6 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
         </button>
       </div>
     </aside>
+  </>
   );
 }

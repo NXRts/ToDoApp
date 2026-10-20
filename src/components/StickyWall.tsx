@@ -43,7 +43,7 @@ export function StickyWall({ notes, onAddNote, onUpdateNote, onDeleteNote }: Sti
             <div
               key={note.id}
               className={twMerge(
-                "group relative min-h-[280px] p-8 rounded-3xl transition-all flex flex-col focus-within:ring-2 focus-within:ring-foreground/20 focus-within:shadow-xl",
+                "group relative min-h-70 p-8 rounded-3xl transition-all flex flex-col focus-within:ring-2 focus-within:ring-foreground/20 focus-within:shadow-xl",
                 getStickyColor(note.color),
                 "border shadow-sm"
               )}
@@ -87,7 +87,7 @@ export function StickyWall({ notes, onAddNote, onUpdateNote, onDeleteNote }: Sti
         {/* Add New Note Card */}
         <div
           onClick={onAddNote}
-          className="min-h-[280px] rounded-3xl border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:bg-muted/30 hover:border-muted-foreground/30 transition-all group"
+          className="min-h-70 rounded-3xl border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:bg-muted/30 hover:border-muted-foreground/30 transition-all group"
         >
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
             <Plus size={32} className="text-muted-foreground" />
