@@ -1,38 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { User, Moon, Sun, Monitor, Bell, Shield, Database, Info, Trash2, Download, Upload } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
 export function SettingsView() {
   const [activeTab, setActiveTab] = useState('general');
-  
-  // Settings State
-  const [profile, setProfile] = useState(() => {
-    if (typeof window === 'undefined') return { name: 'NXRts', email: '' };
-    return JSON.parse(localStorage.getItem('todo_profile') || '{"name": "NXRts", "email": ""}');
-  });
-
   type ThemeOption = 'light' | 'dark' | 'system';
 
-  const [appearance, setAppearance] = useState(() => {
-    if (typeof window === 'undefined') return { theme: 'light' as ThemeOption, glassmorphism: true, compact: false };
-    return JSON.parse(localStorage.getItem('todo_appearance') || '{"theme": "light", "glassmorphism": true, "compact": false}') as { theme: ThemeOption; glassmorphism: boolean; compact: boolean };
-  });
-
-  const [notifications, setNotifications] = useState(() => {
-    if (typeof window === 'undefined') return { reminders: true, summary: false, collab: false };
-    return JSON.parse(localStorage.getItem('todo_notifications') || '{"reminders": true, "summary": false, "collab": false}');
-  });
-
-  // Persistence Effects
-  useEffect(() => {
-    localStorage.setItem('todo_profile', JSON.stringify(profile));
-  }, [profile]);
+  // Settings State using hydration-safe useLocalStorage
+  const [profile, setProfile] = useLocalStorage('todo_profile', { name: 'NXRts', email: '' });
+  const [appearance, setAppearance] = useLocalStorage<{ theme: ThemeOption; glassmorphism: boolean; compact: boolean }>(
+    'todo_appearance',
+    { theme: 'light', glassmorphism: true, compact: false }
+  );
+  const [notifications, setNotifications] = useLocalStorage(
+    'todo_notifications',
+    { reminders: true, summary: false, collab: false }
+  );
 
   useEffect(() => {
-    localStorage.setItem('todo_appearance', JSON.stringify(appearance));
-    
     // Apply Theme
     const root = window.document.documentElement;
     if (appearance.theme === 'dark') {
@@ -54,10 +42,6 @@ export function SettingsView() {
       root.classList.remove('glass-enabled');
     }
   }, [appearance]);
-
-  useEffect(() => {
-    localStorage.setItem('todo_notifications', JSON.stringify(notifications));
-  }, [notifications]);
 
   const handleClearData = () => {
     if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
