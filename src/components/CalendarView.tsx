@@ -184,7 +184,7 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
                 <div 
                   key={day.toISOString()} 
                   className={twMerge(
-                    "border-r border-b border-border min-h-[120px] p-2 flex flex-col gap-1 transition-colors hover:bg-muted/10",
+                    "border-r border-b border-border min-h-30 p-2 flex flex-col gap-1 transition-colors hover:bg-muted/10",
                     !isCurrentMonth && "bg-muted/5 opacity-50",
                     isTodayDate && "bg-muted/20"
                   )}
@@ -260,7 +260,7 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
               {/* Hour Labels */}
               <div className="absolute -left-20 top-0 bottom-0 w-20">
                 {hours.map(hour => (
-                  <div key={hour} className="h-[100px] relative">
+                  <div key={hour} className="h-25 relative">
                     <span className="absolute right-4 -top-2 text-[10px] font-bold text-muted-foreground text-right">
                       {format(new Date().setHours(hour, 0), 'hh:00')}
                       <br />
@@ -274,17 +274,17 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
               {viewMode === 'Week' ? (
                 weekDays.map(day => (
                   <div key={day.toISOString()} className={twMerge(
-                    "border-r border-border relative min-h-[2400px]",
+                    "border-r border-border relative min-h-600",
                     isSameDay(day, new Date()) && "bg-muted/30"
                   )}>
                     {hours.map(hour => (
-                      <div key={hour} className="h-[100px] border-t border-border" />
+                      <div key={hour} className="h-25 border-t border-border" />
                     ))}
                   </div>
                 ))
               ) : (
                 hours.map(hour => (
-                  <div key={hour} className="h-[100px] border-t border-border" />
+                  <div key={hour} className="h-25 border-t border-border" />
                 ))
               )}
 
@@ -294,7 +294,7 @@ export function CalendarView({ tasks, lists, onTaskClick, selectedTaskId }: Cale
                   className="absolute left-0 right-0 z-10 flex items-center pointer-events-none"
                   style={{ top: `${currentTimePosition}px` }}
                 >
-                  <div className="w-2.5 h-2.5 rounded-full bg-foreground ml-[-5px]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-foreground -ml-1.25" />
                   <div className="flex-1 h-px bg-foreground" />
                 </div>
               )}

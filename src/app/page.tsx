@@ -13,6 +13,9 @@ import { DashboardView } from '@/components/DashboardView';
 import { HabitTrackerView } from '@/components/HabitTrackerView';
 import { ViewMode } from '@/types/todo';
 import { isToday, isTomorrow, parseISO } from 'date-fns';
+import { Menu, Plus } from 'lucide-react';
+import { MobileBottomBar } from '@/components/MobileBottomBar';
+import { QuickAddModal } from '@/components/QuickAddModal';
 
 export default function Home() {
   const { 
@@ -30,6 +33,23 @@ export default function Home() {
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+
+  // Compute uncompleted tasks count for Today
+  const todayTasksCount = useMemo(() => {
+    return tasks.filter(t => {
+      if (t.isCompleted) return false;
+      const deadlineDate = t.deadline ? parseISO(t.deadline) : null;
+      const createdDate = parseISO(t.createdAt);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      if (deadlineDate) {
+        return isToday(deadlineDate) || deadlineDate < now;
+      }
+      return isToday(createdDate) || createdDate < now;
+    }).length;
+  }, [tasks]);
 
   // Apply Settings globally
   useEffect(() => {
@@ -131,23 +151,55 @@ export default function Home() {
     <div className="flex w-full h-screen bg-background overflow-hidden">
       <Sidebar 
         currentView={currentView} 
-        onViewChange={(view) => { setCurrentView(view); setSelectedListId(null); }} 
+        onViewChange={(view) => { setCurrentView(view); setSelectedListId(null); setIsMobileDrawerOpen(false); }} 
         lists={lists} 
         tasks={tasks}
         tags={tags}
         selectedListId={selectedListId}
-        onListSelect={setSelectedListId}
+        onListSelect={(id) => { setSelectedListId(id); setIsMobileDrawerOpen(false); }}
         onAddList={() => addList('New List', 'bg-blue-500')}
         onUpdateList={updateList}
         onDeleteList={deleteList}
         onAddTag={() => addTag('New Tag', 'bg-slate-500')}
         onUpdateTag={updateTag}
         onDeleteTag={deleteTag}
+        isOpen={isMobileDrawerOpen}
+        onClose={() => setIsMobileDrawerOpen(false)}
       />
       
-      <main className="flex-1 flex flex-col p-8 lg:px-12 xl:px-16 lg:py-10 overflow-y-auto custom-scrollbar">
-        {/* Main Header */}
-        <header className="flex items-center gap-4 mb-8">
+      <main className="flex-1 flex flex-col p-4 sm:p-6 md:p-8 lg:px-12 xl:px-16 lg:py-10 pb-28 md:pb-10 overflow-y-auto custom-scrollbar">
+        {/* Mobile Top App Bar */}
+        <header className="flex md:hidden items-center justify-between py-2.5 px-3 mb-4 bg-card/70 backdrop-blur-md rounded-2xl border border-border/60 sticky top-0 z-20 shadow-xs">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <button
+              onClick={() => setIsMobileDrawerOpen(true)}
+              aria-label="Open navigation menu"
+              className="p-2 -ml-1 text-foreground hover:bg-muted rounded-xl transition-colors active:scale-95 cursor-pointer shrink-0"
+            >
+              <Menu size={20} />
+            </button>
+            <div className="flex items-center gap-2 min-w-0">
+              <h1 className="text-base font-bold tracking-tight text-foreground truncate">{headerTitle}</h1>
+              <span className="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-muted text-[11px] font-bold text-foreground shrink-0">
+                {currentView === 'dashboard' ? (tasks.filter(t => !t.isCompleted).length) : 
+                 currentView === 'habits' ? habits.length : 
+                 currentView === 'sticky-wall' ? notes.length :
+                 filteredTasks.length}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsQuickAddOpen(true)}
+            aria-label="Add task"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-foreground text-background text-xs font-bold hover:opacity-90 active:scale-95 transition-all shadow-xs shrink-0 cursor-pointer"
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            <span>Task</span>
+          </button>
+        </header>
+
+        {/* Desktop Header */}
+        <header className="hidden md:flex items-center gap-4 mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">{headerTitle}</h1>
           <div className="flex items-center justify-center min-w-8 h-8 px-2 rounded-lg border border-border text-foreground font-bold text-xl">
             {currentView === 'dashboard' ? (tasks.filter(t => !t.isCompleted).length) : 
@@ -300,6 +352,28 @@ export default function Home() {
           onClose={() => setSelectedTaskId(null)}
         />
       )}
+
+      {/* Mobile Bottom Dock (Thumb Zone) */}
+      <MobileBottomBar 
+        currentView={currentView}
+        onViewChange={(view) => {
+          setCurrentView(view);
+          setSelectedListId(null);
+        }}
+        onQuickAdd={() => setIsQuickAddOpen(true)}
+        todayTasksCount={todayTasksCount}
+      />
+
+      {/* Quick Add Bottom Sheet / Modal */}
+      <QuickAddModal 
+        isOpen={isQuickAddOpen}
+        onClose={() => setIsQuickAddOpen(false)}
+        onAddTask={(title, listId, priority, deadline) => {
+          addTask(title, listId || selectedListId || '', priority || 'Medium', deadline || '');
+        }}
+        lists={lists}
+        defaultListId={selectedListId}
+      />
     </div>
   );
 }

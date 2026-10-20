@@ -181,7 +181,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
           >
             <ChevronLeft size={20} />
           </button>
-          <h2 className="text-lg font-bold min-w-[200px] text-center">
+          <h2 className="text-lg font-bold min-w-50 text-center">
             {headerTitle}
           </h2>
           <button 
@@ -202,18 +202,18 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
       </div>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5">
-          <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-1">Current Streak</p>
-          <h3 className="text-3xl font-black text-indigo-600">12 Days</h3>
+      <div className="grid grid-cols-3 gap-2 sm:gap-6 mb-4">
+        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-3 sm:p-5">
+          <p className="text-[9px] sm:text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-1 truncate">Streak</p>
+          <h3 className="text-lg sm:text-3xl font-black text-indigo-600">12 Days</h3>
         </div>
-        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5">
-          <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Completion Rate</p>
-          <h3 className="text-3xl font-black text-emerald-600">84%</h3>
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3 sm:p-5">
+          <p className="text-[9px] sm:text-[10px] font-bold text-emerald-500 uppercase tracking-wider mb-1 truncate">Completion</p>
+          <h3 className="text-lg sm:text-3xl font-black text-emerald-600">84%</h3>
         </div>
-        <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-5">
-          <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest mb-1">Best Habit</p>
-          <h3 className="text-3xl font-black text-orange-600">Meditation</h3>
+        <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-3 sm:p-5">
+          <p className="text-[9px] sm:text-[10px] font-bold text-orange-500 uppercase tracking-wider mb-1 truncate">Best Habit</p>
+          <h3 className="text-lg sm:text-3xl font-black text-orange-600 truncate">Meditation</h3>
         </div>
       </div>
 
@@ -238,7 +238,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
                   const isTodayMarker = isSameDay(day, new Date());
 
                   return (
-                    <th key={`chart-${dateStr}`} className="p-0 border-b border-r border-border/30 align-bottom h-[100px] min-w-[28px] w-[28px]">
+                    <th key={`chart-${dateStr}`} className="p-0 border-b border-r border-border/30 align-bottom h-25 min-w-7 w-7">
                       <div className="w-full h-full flex items-end justify-center pt-4 pb-2 group relative">
                         {/* Tooltip */}
                         <div className="absolute -top-1 opacity-0 group-hover:opacity-100 transition-opacity bg-foreground text-background text-[10px] font-bold py-0.5 px-1.5 rounded-none pointer-events-none z-30 whitespace-nowrap">
@@ -247,7 +247,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
                         {/* Bar */}
                         <div 
                           className={twMerge(
-                            "w-[12px] rounded-none transition-all duration-500",
+                            "w-3 rounded-none transition-all duration-500",
                             isTodayMarker ? "bg-emerald-500" : (completedCount === habits.length && habits.length > 0) ? "bg-indigo-500" : "bg-emerald-500/20 group-hover:bg-emerald-500/50"
                           )}
                           style={{ height: `${Math.max(heightPercentage, 4)}%` }}
@@ -259,11 +259,11 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
               </tr>
               {/* First Header Row (Days / Names) */}
               <tr className="bg-emerald-600">
-                <th className="p-3 px-4 text-[11px] font-bold text-white uppercase tracking-widest border-r border-emerald-700/50 min-w-[180px] w-[180px] sticky left-0 z-20 bg-emerald-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                <th className="p-3 px-4 text-[11px] font-bold text-white uppercase tracking-widest border-r border-emerald-700/50 min-w-45 w-45 sticky left-0 z-20 bg-emerald-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                   {viewMode === 'monthly' ? format(currentDate, 'MMMM') : 'HABIT'}
                 </th>
                 {datesToRender.map(day => (
-                  <th key={`header1-${day.toISOString()}`} className="p-1 text-center border-r border-emerald-700/50 text-white min-w-[28px] w-[28px]">
+                  <th key={`header1-${day.toISOString()}`} className="p-1 text-center border-r border-emerald-700/50 text-white min-w-7 w-7">
                     <span className="text-[11px] font-black">{format(day, 'd')}</span>
                   </th>
                 ))}
@@ -427,7 +427,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
 
                     <div 
                       className={twMerge(
-                        "flex flex-row flex-nowrap gap-2 overflow-x-auto pb-1 pt-1.5 scrollbar-none min-h-[44px] w-full max-w-full select-none",
+                        "flex flex-row flex-nowrap gap-2 overflow-x-auto pb-1 pt-1.5 scrollbar-none min-h-11 w-full max-w-full select-none",
                         isDragStart ? "cursor-grabbing" : "cursor-grab"
                       )}
                       onWheel={handleHorizontalScroll}
@@ -446,7 +446,7 @@ export function HabitTrackerView({ habits, onToggleHabit, onAddHabit, onUpdateHa
                           <span className={twMerge("w-6 h-6 flex items-center justify-center rounded-lg text-sm shrink-0", template.color)}>
                             {template.icon}
                           </span>
-                          <span className="truncate max-w-[120px]">{template.name}</span>
+                          <span className="truncate max-w-30">{template.name}</span>
                         </button>
                       ))}
                     </div>
