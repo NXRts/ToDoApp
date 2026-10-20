@@ -108,7 +108,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
     <aside className="w-64 h-screen bg-sidebar flex flex-col border-r border-border shrink-0 py-6 px-4 overflow-y-auto custom-scrollbar">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 px-2">
-        <h1 className="text-xl font-bold tracking-tight">Menu</h1>
+        <h1 className="text-xl font-bold tracking-tight">ToDoApp</h1>
         <button className="text-muted-foreground hover:text-foreground">
           <Menu size={20} />
         </button>
@@ -235,7 +235,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
                 <li key={list.id} className="animate-in fade-in slide-in-from-top-1 duration-200 my-2 px-1">
                   <div className="bg-muted/10 border border-border/50 rounded-2xl p-4 space-y-4">
                     <div className="flex items-center gap-4 bg-muted/20 border border-border/40 rounded-xl px-4 py-3">
-                      <div className={twMerge("w-4 h-4 rounded-[6px] shrink-0", newListColor)}></div>
+                      <div className={twMerge("w-4 h-4 rounded-md shrink-0", newListColor)}></div>
                       <input 
                         autoFocus
                         type="text" 
@@ -288,7 +288,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={twMerge("w-3 h-3 rounded-[4px]", list.color)}></div>
+                    <div className={twMerge("w-3 h-3 rounded-sm", list.color)}></div>
                     <span>{list.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -329,7 +329,7 @@ export function Sidebar({ lists, tasks, tags, currentView, onViewChange, selecte
             <li className="mt-4 animate-in fade-in slide-in-from-top-2 duration-200 px-1">
               <div className="bg-muted/10 border border-border/50 rounded-2xl p-4 space-y-4">
                 <div className="flex items-center gap-4 bg-muted/20 border border-border/40 rounded-xl px-4 py-3">
-                  <div className={twMerge("w-4 h-4 rounded-[6px] shrink-0", newListColor)}></div>
+                  <div className={twMerge("w-4 h-4 rounded-md shrink-0", newListColor)}></div>
                   <input 
                     autoFocus
                     type="text" 

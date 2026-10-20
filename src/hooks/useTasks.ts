@@ -100,8 +100,8 @@ export function useTasks() {
   };
 
   const [habits, setHabits] = useLocalStorage<Habit[]>('todo_habits', [
-    { id: 'h1', name: 'Morning Meditation', color: 'bg-indigo-500', icon: '🧘', frequency: 'daily', goal: 7, logs: [], createdAt: new Date().toISOString() },
-    { id: 'h2', name: 'Read 30 mins', color: 'bg-orange-500', icon: '📚', frequency: 'daily', goal: 7, logs: [], createdAt: new Date().toISOString() },
+    { id: 'h1', name: 'Morning Meditation', color: 'bg-indigo-500', icon: '🧘', frequency: 'daily', goal: 7, logs: [], createdAt: '2026-01-01T00:00:00.000Z' },
+    { id: 'h2', name: 'Read 30 mins', color: 'bg-orange-500', icon: '📚', frequency: 'daily', goal: 7, logs: [], createdAt: '2026-01-01T00:00:00.000Z' },
   ]);
 
   const addHabit = (name: string, color: string, icon: string, frequency: 'daily' | 'weekly', goal: number) => {
@@ -143,8 +143,8 @@ export function useTasks() {
 
   // --- Notes Management (Sticky Wall) ---
   const [notes, setNotes] = useLocalStorage<Note[]>('todo_notes', [
-    { id: 'n1', title: 'Idea: App features', content: '- Habit tracker\n- Productivity dashboard\n- Analytics', color: 'bg-yellow-400', createdAt: new Date().toISOString() },
-    { id: 'n2', title: 'Groceries', content: 'Milk\nBread\nEggs', color: 'bg-green-400', createdAt: new Date().toISOString() }
+    { id: 'n1', title: 'Idea: App features', content: '- Habit tracker\n- Productivity dashboard\n- Analytics', color: 'bg-yellow-400', createdAt: '2026-01-01T00:00:00.000Z' },
+    { id: 'n2', title: 'Groceries', content: 'Milk\nBread\nEggs', color: 'bg-green-400', createdAt: '2026-01-01T00:00:00.000Z' }
   ]);
 
   const addNote = (color: string = 'bg-yellow-400') => {

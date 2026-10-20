@@ -1,34 +1,53 @@
-import { useState, useEffect, useRef } from 'react';
+import { useSyncExternalStore, useCallback, useMemo } from 'react';
 
-function getStoredValue<T>(key: string, initialValue: T): T {
-  if (typeof window === 'undefined') return initialValue;
-
-  try {
-    const item = window.localStorage.getItem(key);
-    return item ? JSON.parse(item) : initialValue;
-  } catch (error) {
-    console.warn(`Error reading localStorage key "${key}":`, error);
-    return initialValue;
-  }
+function subscribe(callback: () => void) {
+  window.addEventListener('storage', callback);
+  window.addEventListener('local-storage-update', callback);
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener('local-storage-update', callback);
+  };
 }
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  const isFirstRender = useRef(true);
-  const [storedValue, setStoredValue] = useState<T>(() => getStoredValue(key, initialValue));
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
+  const getSnapshot = useCallback(() => {
     try {
-      window.localStorage.setItem(key, JSON.stringify(storedValue));
-    } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error);
+      return window.localStorage.getItem(key);
+    } catch {
+      return null;
     }
-  }, [key, storedValue]);
+  }, [key]);
 
-  return [storedValue, setStoredValue] as const;
+  const getServerSnapshot = useCallback(() => {
+    return null;
+  }, []);
+
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  const storedValue = useMemo(() => {
+    if (raw === null) return initialValue;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return initialValue;
+    }
+  }, [raw, initialValue]);
+
+  const setValue = useCallback(
+    (value: T | ((val: T) => T)) => {
+      try {
+        const currentItem = window.localStorage.getItem(key);
+        const currentVal = currentItem !== null ? JSON.parse(currentItem) : initialValue;
+        const valueToStore = value instanceof Function ? value(currentVal) : value;
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        window.dispatchEvent(new Event('local-storage-update'));
+      } catch (error) {
+        console.warn(`Error setting localStorage key "${key}":`, error);
+      }
+    },
+    [key, initialValue]
+  );
+
+  return [storedValue, setValue] as const;
 }
 

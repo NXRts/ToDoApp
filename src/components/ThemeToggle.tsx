@@ -1,34 +1,41 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore, useCallback } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return (
-      localStorage.theme === 'dark' ||
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    );
-  });
+function subscribe(callback: () => void) {
+  window.addEventListener('storage', callback);
+  window.addEventListener('local-storage-update', callback);
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener('local-storage-update', callback);
+  };
+}
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    document.documentElement.classList.toggle('dark', isDark);
-    localStorage.theme = isDark ? 'dark' : 'light';
-  }, [isDark]);
+export function ThemeToggle() {
+  const getSnapshot = useCallback(() => {
+    try {
+      return (
+        localStorage.theme === 'dark' ||
+        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      );
+    } catch {
+      return false;
+    }
+  }, []);
+
+  const isDark = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
   const toggleTheme = () => {
     if (isDark) {
       document.documentElement.classList.remove('dark');
       localStorage.theme = 'light';
-      setIsDark(false);
     } else {
       document.documentElement.classList.add('dark');
       localStorage.theme = 'dark';
-      setIsDark(true);
     }
+    window.dispatchEvent(new Event('local-storage-update'));
   };
 
   return (
