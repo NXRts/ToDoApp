@@ -236,6 +236,8 @@ export default function Home() {
               lists={lists} 
               onTaskClick={setSelectedTaskId}
               selectedTaskId={selectedTaskId}
+              onAddEvent={() => setIsQuickAddOpen(true)}
+              onToggleTask={toggleTaskCompletion}
             />
           ) : currentView === 'sticky-wall' ? (
             <StickyWall 
